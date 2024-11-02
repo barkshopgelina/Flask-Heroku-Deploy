@@ -1,0 +1,17 @@
+ # Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Build outputs
+dist/
+build/
+
+# Environment variables
+.env
+
+# Ignore sensitive files
+static/js/*.json
+imrad-generator-438711-78866a83ef28.json:.json
+
