@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "imrad-generator-438711",
+  "private_key_id": "78866a83ef2843f60dfce7f21048864722202df2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDPNWhG/OuT7eIk\nWzD1w8paGrrgjzWnMC1InPeRDV/FNLIAtTXABRxV8vt5cXE7PMJmNAOHxQKLhaRG\n1BGLIK7019lq3WrCpX/7GGCKHBnTBcWZb+lhx+f389deQ+2E999wO1jH4GzIhJis\nJXUrJDe2jIFNmVwxdEy4VrdjvOLU9OEFEy1YRE1TmuAV48PUW5ljj87r6bRQ2LMP\nWFl4WjKADOF6p3UWzGzs8VYfRqgawSY0w3U9SNo1xKsgX9JMV1mvPyV1V8w2kiSX\n9iGOkkoNOemUCF6aMAkW3BBHJpO2vWdCzyogys35LeVhf8v6hVe+dFt64kl0dO8z\n7xRgHZ1bAgMBAAECggEAAwGtl7z0LdRiltksLFXhAyCvu+jVxBsNEJYpVbn4mGq5\nZQzOWhD9fTF9KnxxQoUjY4quGG8D3132aS6vj1Zz/tzGo1XRj62by9sgn3mJnz7g\nscLCA4L8RFHXFl+RPBIvPW9LlY7e3lrTU23WSAkvSFYqAdrh4e6s/7wGYQt18R7u\nFU40rUrPcrgq4gqeuKJAqEF+mKe1X+KkVzix9v/ez3GYiJ99SN7S826rN5sQyhXK\n/1G/EoA/rs7X3C4z0BUcYfDRRnXHwh2SYUwMd1wtTCumMoSKq2uM7XYOGAfRCqp1\n2J0hzszU2t1sr2gwO8v8YYrUQTeNFDPnB69ix2gwQQKBgQD3MtLFHxQ3m0d+FP21\n/Hs6PnzD5o/5+KAg2JgJBnJptFISPRRA92jSxXhtOrMMUK+Ur6sT4evV58HAniYP\nuXmIlCE0dtReaPWuNrTgR4Rn2fU70Gw54AzzzUGWq140jbycRirJrV083z9JBjow\nosaLK/K9TXzxu7F+yEIfzlCIwQKBgQDWlhUHzt9QjcJiqKKffqjRE4jrj1XCOPz1\nAzAQOWpiKUlS+rpIgUaJfYKyF6GY5x8Gp2liWRDH3vR8vcgATNC7JsEo0bGxjpDF\nrbEArB+b63EdZy/oqjuaY8d537mLszQmtcTHsTGMfbb3gqsZjH1t4SfGgg6iiEqT\n7s3FL8JxGwKBgQCpUQVvAVeestwoLwaMlVBuV4irwgvR4wsDFHgmjmTlpB4m4fEy\ngoQpAhr3biJfiBCLnjtm1fLsQ97BKVHWqWrmMtf/kHjr5aaJ2mzPxgyZ+X9wpdTL\nW3xjra6EHgLbqk2LGMCL/RQE8sDtKrfGwmeNwd907FNtW+s6dL5d/LnKwQKBgQC2\nB7ZrWzfgs4BUBM1/EwjN4w5hFMQg8ArVJREekjYGcxN6Sqq/WrqlY0z9GkLA3D5b\nfKRPA1LS2fT35F3Gs2LVf7iXkdp0zoVMy1y9P0XJFF5uHNxtOAs7mqzaW8igEzKI\nK+VzqIJptTMCn1vZXm4ASeFd6XHUulzZRNhVD4CYRQKBgQDQSPX/0W9OCQ+LwXCV\ns/M7rxg+OwXtFz87g60Src4Re6cUdyROfDpRJk6zw/0NQXbJ4IBofhR+5gLHmigX\nms4EWgjRh40P0dXjuD+aNwUo2XUK/uwCSeevGY+diUOPdxGCU2LaTHIO+UlxWZ48\nxYp1E7MFx5V3LRMdVZl29lL1nA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "imrad-generator@imrad-generator-438711.iam.gserviceaccount.com",
+  "client_id": "106169919050706557401",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/imrad-generator%40imrad-generator-438711.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
