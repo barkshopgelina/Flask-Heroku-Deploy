@@ -1,17 +1,14 @@
- # Node modules
+# Ignore node_modules directory
 node_modules/
 
-# Logs
+# Ignore log files
 *.log
 
-# Build outputs
-dist/
-build/
-
-# Environment variables
-.env
-
-# Ignore sensitive files
+# Ignore all JSON files in static/js/ directory
 static/js/*.json
-imrad-generator-438711-78866a83ef28.json:.json
 
+# Ignore a specific file
+sensitive_data.json
+
+# Ignore all files with .env extension
+*.env
