@@ -4,7 +4,6 @@ from flask import current_app as app
 import uuid
 import os
 from models import User, Admin  # Make sure to import your User and Admin models
-from database import db  # Assuming db is your SQLAlchemy instance
 
 # Register page for users
 def user_register():
