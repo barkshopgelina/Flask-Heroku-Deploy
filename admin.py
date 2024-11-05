@@ -1,6 +1,5 @@
 from flask import render_template, flash, request, redirect, url_for, jsonify, send_file, abort, session
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from connect import get_database_connection
 from user import get_project_details
 from pdf import PDFConfig
 import io

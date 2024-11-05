@@ -1,7 +1,6 @@
 from flask import render_template, request, jsonify, session, redirect, url_for, flash
 from authentication import get_user_id_from_username, get_user_saved_project_ids, change_password
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from connect import get_database_connection
 import os
 
 # Function to fetch current user's details including profile picture
