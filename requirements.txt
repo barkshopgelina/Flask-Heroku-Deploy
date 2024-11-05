@@ -75,9 +75,6 @@ networkx==3.4.2
 nibabel==5.3.2
 nipype==1.9.0
 numpy==1.26.4
-onnx==1.17.0
-onnx-tf==1.10.0
-onnxruntime==1.20.0
 openai==1.53.0
 opt_einsum==3.4.0
 optree==0.13.0
