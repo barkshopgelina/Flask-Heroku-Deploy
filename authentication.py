@@ -1,11 +1,10 @@
 from flask import render_template, request, session, redirect, url_for
-from user_management import register_user as reg_user, register_admin as reg_admin, authenticate_user as auth_user, authenticate_admin as auth_admin, admin_count, change_user_password, update_user_profile, allowed_file
-from werkzeug.utils import secure_filename
-from connect import get_database_connection
-import uuid as uuid
+from user_management import register_user as reg_user, register_admin as reg_admin, authenticate_user as auth_user, authenticate_admin as auth_admin
 from flask import current_app as app
+import uuid
 import os
-
+from models import User, Admin  # Make sure to import your User and Admin models
+from database import db  # Assuming db is your SQLAlchemy instance
 
 # Register page for users
 def user_register():
@@ -29,20 +28,19 @@ def user_register():
             return redirect(url_for('login'))
         except Exception as e:
             print(f"Error registering user: {e}")
-            error_message = str(e)  # Store the error message for easier checking
+            error_message = str(e)
             if "A user with the same details already exists." in error_message:
                 return render_template('user_register.html', error="A user with the same details already exists.")
             elif "Username already exists." in error_message:
                 return render_template('user_register.html', error="Username already exists. Please choose a different one.")
             return render_template('user_register.html', error="Registration failed. Please try again.")
 
-    # Return a default response for GET requests (rendering the registration form)
     return render_template('user_register.html')
 
 
 # Register page for admins
 def admin_register():
-    if admin_count() >= 2:
+    if Admin.query.count() >= 2:  # Assuming you have a count method or use query.count()
         return render_template('admin_register.html', error="Admin registration limit reached.")
 
     if request.method == 'POST':
@@ -51,9 +49,8 @@ def admin_register():
         password = request.form['password']
 
         # Call the registration function
-        register_success = reg_admin(username, email, password)  # Correct function call
-        
-        print("Register Success:", register_success)  # Debugging line
+        register_success = reg_admin(username, email, password)
+        print("Register Success:", register_success)
 
         if register_success:
             return redirect(url_for('admin_login'))
@@ -63,28 +60,15 @@ def admin_register():
     return render_template('admin_register.html')
 
 
-
 # Function to get user ID from username
 def get_user_id_from_username(username):
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT user_id FROM users WHERE username = %s", (username,))
-    user_id = cursor.fetchone()
-    conn.close()
-    if user_id:
-        return user_id[0]
-    return None
+    user = User.query.filter_by(username=username).first()  # Use SQLAlchemy ORM
+    return user.id if user else None
 
 # Function to get admin ID from username
 def get_admin_id_from_username(username):
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT admin_id FROM admins WHERE username = %s", (username,))
-    admin_id = cursor.fetchone()
-    conn.close()
-    if admin_id:
-        return admin_id[0]
-    return None
+    admin = Admin.query.filter_by(username=username).first()  # Use SQLAlchemy ORM
+    return admin.id if admin else None
 
 # Login page
 def login():
@@ -96,28 +80,23 @@ def login():
             return render_template('login.html', error="All fields are required.")
 
         if auth_user(username, password):
-            conn = get_database_connection()
-            cursor = conn.cursor()
+            user = User.query.filter_by(username=username).first()
+            if user:
+                user.status = 'active'  # Update user status to 'active'
+                user.last_active = datetime.utcnow()  # Update last active time
+                db.session.commit()  # Commit the changes
 
-            # Update user status to 'active' in the database
-            cursor.execute("UPDATE users SET status = 'active', last_active = NOW() WHERE username = %s", (username,))
-            conn.commit()
+                session['user_id'] = user.id
+                session['username'] = username
+                session['logged_in'] = True
+                return redirect(url_for('home'))
 
-            cursor.close()
-            conn.close()
-
-            user_id = get_user_id_from_username(username)
-            session['user_id'] = user_id
-            session['username'] = username
-            session['logged_in'] = True
-            return redirect(url_for('home'))
-        else:
-            return render_template('login.html', error="Invalid username or password. Please try again.")
+        return render_template('login.html', error="Invalid username or password. Please try again.")
 
     return render_template('login.html')
 
 
-# Admin ogin page
+# Admin login page
 def admin_login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -127,55 +106,48 @@ def admin_login():
             return render_template('admin_login.html', error="All fields are required.")
 
         if auth_admin(username, password):
-            admin_id = get_admin_id_from_username(username)
-            session['user_id'] = admin_id
-            session['username'] = username
-            session['logged_in'] = True
-            return redirect(url_for('admin_index'))
-        else:
-            return render_template('admin_login.html', error="Invalid username or password. Please try again.")
+            admin = Admin.query.filter_by(username=username).first()  # Use SQLAlchemy ORM
+            if admin:
+                session['user_id'] = admin.id
+                session['username'] = username
+                session['logged_in'] = True
+                return redirect(url_for('admin_index'))
+
+        return render_template('admin_login.html', error="Invalid username or password. Please try again.")
 
     return render_template('admin_login.html')
 
+
 # Logout
 def logout():
-     # Clear user status in the database
     if 'username' in session:
         username = session['username']
+        user = User.query.filter_by(username=username).first()  # Use SQLAlchemy ORM
 
-        conn = get_database_connection()
-        cursor = conn.cursor()
+        if user:
+            user.status = None  # Clear user status
+            db.session.commit()  # Commit the changes
 
-        cursor.execute("UPDATE users SET status = NULL WHERE username = %s", (username,))
-        conn.commit()
-
-        cursor.close()
-        conn.close()
-
-        # Clear session variables
         session.pop('user_id', None)
         session.pop('username', None)
         session.pop('logged_in', None)
-        
+
     return redirect(url_for('index'))
 
-#Admin Logout
+
+# Admin Logout
 def logout_admin():
-    # Clear admin session data
     session.pop('admin_logged_in', None)
     return redirect(url_for('admin_login'))
 
+
 # Function to get user-specific saved project IDs
 def get_user_saved_project_ids(user_id):
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT project_id FROM user_library WHERE user_id = %s", (user_id,))
-        saved_project_ids = [row[0] for row in cursor.fetchall()]
-        return saved_project_ids
-    finally:
-        cursor.close()
-        conn.close()
+    user = User.query.get(user_id)  # Get user by ID
+    if user:
+        return [project.id for project in user.saved_projects]  # Assuming relationship is set up
+    return []
+
 
 # Change Password
 def change_password():
@@ -199,7 +171,10 @@ def change_password():
             return render_template('change_password.html', error="Current password is incorrect.")
 
         # Change password in the database
-        if change_user_password(username, new_password):
+        user = User.query.filter_by(username=username).first()
+        if user:
+            user.password = new_password  # Update password
+            db.session.commit()  # Commit the changes
             return render_template('change_password.html', success="Password changed successfully.")
         else:
             return render_template('change_password.html', error="Failed to change password. Please try again.")
@@ -208,12 +183,7 @@ def change_password():
 
 
 def get_user_by_id(user_id):
-    conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)  # Enable dictionary cursor
-    cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
-    user = cursor.fetchone()
-    conn.close()
-    return user
+    return User.query.get(user_id)  # Use SQLAlchemy ORM to get user by ID
 
 def edit_profile():
     if 'user_id' not in session:
@@ -244,8 +214,18 @@ def edit_profile():
                 profile_picture_url = os.path.join('static/images', unique_filename)
 
         # Update user profile
-        success = update_user_profile(user_id, first_name, last_name, username, email, course, major, year_level, profile_picture_url)
-        if success:
+        user = User.query.get(user_id)  # Use SQLAlchemy ORM to get user
+        if user:
+            user.first_name = first_name
+            user.last_name = last_name
+            user.username = username
+            user.email = email
+            user.course = course
+            user.major = major
+            user.year_level = year_level
+            user.profile_picture_url = profile_picture_url
+
+            db.session.commit()  # Commit the changes
             return redirect(url_for('user_profile'))
         else:
             return render_template('edit_profile.html', error="Failed to update profile. Please try again.", user=get_user_by_id(user_id))
