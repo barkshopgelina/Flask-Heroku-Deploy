@@ -1,4 +1,4 @@
-from .connect import get_database_connection
+from connect import get_database_connection
 import mysql.connector
 import bcrypt
 from config import Config
