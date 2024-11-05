@@ -7,7 +7,7 @@ def get_database_connection():
             host="localhost",
             user="root",
             password="",
-            database="repositorydb"
+            database="repository"
         )
         return connection
     except mysql.connector.Error as err:

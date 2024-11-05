@@ -762,10 +762,16 @@ table.dataTable thead .sorting:after {
 .btn-secondary  {
     color: #138496!important;
 }
-
+.tab-icon   {
+    height:40px;
+    margin-right:5px;
+}
 
 @media (max-width:780px)    {
-    .custom-color-logo  {
-        color: transparent!important;
+    .custom-search-form {
+        margin-top:50px;
+    }
+    .tab-icon {
+        display:none;
     }
 }

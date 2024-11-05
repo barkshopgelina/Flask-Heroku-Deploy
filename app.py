@@ -1,5 +1,5 @@
-from flask import Flask, redirect, url_for
-from user import index, reset_password_request, home, browse, search, project_details, about, about_us, user_profile, user_library, save_project, delete_project, basename_filter
+from flask import Flask
+from user import index,reset_password_request, home, browse, search, project_details, about, about_us, user_profile, user_library, save_project, delete_project, basename_filter
 from authentication import user_register, admin_register, admin_login, login, logout, logout_admin, change_password, edit_profile
 from admin import admin_index, admin_view_project, reset_password, update_last_active, view_pdf, capstone_projects, active_users, users, upload_project, edit_project, delete_capstone_project, delete_user
 from flask_session import Session
@@ -7,8 +7,8 @@ import uuid as uuid
 from config import Config
 from flask_cors import CORS
 
-app = Flask(__name__)
 
+app = Flask(__name__)
 # Configure server-side session storage
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -19,6 +19,7 @@ app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
 app.config.from_object(Config)
 app.jinja_env.filters['basename'] = basename_filter
 
+
 Session(app)
 
 # Routes from authentication.py
@@ -27,7 +28,7 @@ app.add_url_rule('/signup/admin', endpoint='register_admin', view_func=admin_reg
 app.add_url_rule('/profile_actions/edit_profile', endpoint='edit_profile', view_func=edit_profile, methods=['GET', 'POST'])
 app.add_url_rule('/login', endpoint='login', view_func=login, methods=['GET', 'POST'])
 app.add_url_rule('/login/admin', endpoint='admin_login', view_func=admin_login, methods=['GET', 'POST'])
-app.add_url_rule('/logout', endpoint='logout', view_func=logout, methods=['GET', 'POST'])
+app.add_url_rule('/logout', endpoint='logout', view_func=logout, methods=['GET','POST'])
 app.add_url_rule('/admin/logout', endpoint='logout_admin', view_func=logout_admin)
 
 # Routes from user.py
@@ -45,10 +46,11 @@ app.add_url_rule('/project/<identifier>', endpoint='project_details', view_func=
 app.add_url_rule('/save_project', endpoint='save_project', view_func=save_project, methods=['POST'])
 app.add_url_rule('/delete_project', endpoint='delete_project', view_func=delete_project, methods=['POST'])
 
-# Routes from admin.py
+
+#Routes from admin.py
 app.add_url_rule('/admin_dashboard', endpoint='admin_index', view_func=admin_index, methods=['GET'])
 app.add_url_rule('/admin/view_project/<int:project_id>', endpoint='admin_view_project', view_func=admin_view_project)
-app.add_url_rule('/admin/reset_password/<int:user_id>', endpoint='reset_password', view_func=reset_password, methods=['GET', 'POST'])
+app.add_url_rule('/admin/reset_password/<int:user_id>', endpoint='reset_password', view_func=reset_password,methods=['GET', 'POST'])
 app.add_url_rule('/admin/capstone_projects', endpoint='capstone_projects', view_func=capstone_projects, methods=['GET'])
 app.add_url_rule('/admin/users', endpoint='users', view_func=users, methods=['GET'])
 app.add_url_rule('/admin/active_users', endpoint='active_users', view_func=active_users, methods=['GET'])
@@ -58,14 +60,11 @@ app.add_url_rule('/admin/delete_project', endpoint='delete_capstone_project', vi
 app.add_url_rule('/admin/delete_user', endpoint='delete_user', view_func=delete_user, methods=['POST'])
 app.add_url_rule('/view_pdf/<identifier>', endpoint='view_pdf', view_func=view_pdf)
 app.add_url_rule('/update_last_active', endpoint='update_last_active', view_func=update_last_active)
+app.before_request
 
-# Redirect the root URL to the index page
-@app.route('/')
-def home_redirect():
-    return redirect(url_for('index'))
 
-# Initialize CORS
-CORS(app)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+CORS(app)
