@@ -1,19 +1,19 @@
 import mysql.connector
 from urllib.parse import urlparse
 
-# Replace with your JawsDB URL or use environment variable
+# Your JawsDB URL (this part remains unchanged)
 db_url = "mysql://boh3qmod5qu7lrr0:a4fupyk0zfvmpm2u@b4e9xxkxnpu2v96i.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/pf1eq480royf7mk9"
 
 # Parse the URL
 url = urlparse(db_url)
 
-# Set up database connection using the parsed information
+# Set up the database connection configuration using the parsed URL details
 db_config = {
-    "user": url.username,
-    "password": url.password,
-    "host": url.hostname,
-    "port": url.port,
-    "database": url.path[1:]  # remove the leading '/'
+    "user": url.username,  # Extract username
+    "password": url.password,  # Extract password
+    "host": url.hostname,  # Extract hostname
+    "port": url.port,  # Extract port
+    "database": url.path[1:]  # Extract database name (remove leading '/')
 }
 
 # Attempt to connect to the MySQL database
@@ -28,7 +28,8 @@ try:
 
     # Execute each query from the file
     for query in sql_queries.split(";"):
-        if query.strip():  # Skip empty queries
+        query = query.strip()  # Strip extra whitespace/newlines
+        if query:  # Only execute non-empty queries
             cursor.execute(query)
 
     # Commit the changes
