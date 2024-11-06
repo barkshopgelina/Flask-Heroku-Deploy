@@ -1,24 +1,26 @@
 import mysql.connector
 from urllib.parse import urlparse
 
-# Your JawsDB URL (this part remains unchanged)
+# Your JawsDB URL
 db_url = "mysql://boh3qmod5qu7lrr0:a4fupyk0zfvmpm2u@b4e9xxkxnpu2v96i.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/pf1eq480royf7mk9"
 
 # Parse the URL
 url = urlparse(db_url)
 
 # Set up the database connection configuration using the parsed URL details
-db_config = {
-    "user": url.username,  # Extract username
-    "password": url.password,  # Extract password
-    "host": url.hostname,  # Extract hostname
-    "port": url.port,  # Extract port
-    "database": url.path[1:],  # Extract database name (remove leading '/')
-    "raise_on_warnings": True  # Raise warnings if any, for better debugging
-}
+def get_database_connection():
+    return {
+        "user": url.username,  # Extract username
+        "password": url.password,  # Extract password
+        "host": url.hostname,  # Extract hostname
+        "port": url.port,  # Extract port
+        "database": url.path[1:],  # Extract database name (remove leading '/')
+        "raise_on_warnings": True  # Raise warnings if any, for better debugging
+    }
 
 # Test connection separately
 try:
+    db_config = get_database_connection()  # Get the database connection configuration
     conn = mysql.connector.connect(**db_config)
     print("Successfully connected to the database!")
 except mysql.connector.Error as err:
