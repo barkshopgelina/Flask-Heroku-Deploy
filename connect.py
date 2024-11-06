@@ -1,45 +1,43 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
+import mysql.connector
+from urllib.parse import urlparse
 
-# Helper function to create a database connection using SQLAlchemy
-def get_database_connection():
-    try:
-        # Use the Heroku DATABASE_URL directly
-        DATABASE_URL = "postgresql://u27l99coqanlt1:pde56cc32f516f04b002f5e4ca52627e5dac2c5f745ad8736bb9ea693430b14af@c9pv5s2sq0i76o.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d3r9dbg3e66ibn"
-        
-        # Create an engine for connecting to the database
-        engine = create_engine(DATABASE_URL, echo=True)  # `echo=True` will show SQL queries in the output
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        print("Connected to the database")
-        return session
-    except Exception as e:
-        print(f"Error: {e}")
-        return None
+# Replace with your JawsDB URL or use environment variable
+db_url = "mysql://boh3qmod5qu7lrr0:a4fupyk0zfvmpm2u@b4e9xxkxnpu2v96i.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/pf1eq480royf7mk9"
 
-# Function to execute SQL script (migration) using SQLAlchemy
-def migrate_database():
-    session = get_database_connection()
-    if session:
-        try:
-            # Try reading the file with UTF-8 encoding
-            with open('repository.sql', 'r', encoding='utf-8', errors='ignore') as file:
-                sql_script = file.read()
+# Parse the URL
+url = urlparse(db_url)
 
-            # Split the SQL script into individual statements
-            statements = sql_script.split(';')
+# Set up database connection using the parsed information
+db_config = {
+    "user": url.username,
+    "password": url.password,
+    "host": url.hostname,
+    "port": url.port,
+    "database": url.path[1:]  # remove the leading '/'
+}
 
-            # Execute each statement
-            for statement in statements:
-                if statement.strip():
-                    session.execute(text(statement))  # Execute the SQL statement
-            session.commit()  # Commit the transaction
-            print("Migration completed successfully")
-        except Exception as err:
-            print(f"Error: {err}")
-        finally:
-            session.close()
+# Attempt to connect to the MySQL database
+try:
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+    print("Successfully connected to the database!")
 
-if __name__ == "__main__":
-    migrate_database()
+    # Open the repository.sql file with the correct encoding (utf-8)
+    with open("repository.sql", "r", encoding="utf-8") as file:
+        sql_queries = file.read()
+
+    # Execute each query from the file
+    for query in sql_queries.split(";"):
+        if query.strip():  # Skip empty queries
+            cursor.execute(query)
+
+    # Commit the changes
+    conn.commit()
+    print("SQL queries executed successfully!")
+
+    # Close cursor and connection
+    cursor.close()
+    conn.close()
+
+except mysql.connector.Error as err:
+    print(f"Error: {err}")
