@@ -17,33 +17,41 @@ db_config = {
     "raise_on_warnings": True  # Raise warnings if any, for better debugging
 }
 
-# Attempt to connect to the MySQL database
+# Test connection separately
 try:
     conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor()
     print("Successfully connected to the database!")
+except mysql.connector.Error as err:
+    print(f"Error connecting to database: {err}")
+    exit()
+
+# Attempt to execute SQL queries from file
+try:
+    cursor = conn.cursor()
 
     # Open the repository.sql file with the correct encoding (utf-8)
     with open("repository.sql", "r", encoding="utf-8") as file:
         sql_queries = file.read()
 
-    # Execute each query from the file
-    for query in sql_queries.split(";"):
-        query = query.strip()  # Strip extra whitespace/newlines
-        if query:  # Only execute non-empty queries
-            try:
-                cursor.execute(query)
-                print(f"Executed query: {query[:30]}...")  # Print first 30 chars of query for debugging
-            except mysql.connector.Error as err:
-                print(f"Error executing query: {err}")
+    # Split and execute each query
+    queries = [q.strip() for q in sql_queries.split(';') if q.strip()]
+    for query in queries:
+        try:
+            cursor.execute(query)
+            print(f"Executed query: {query[:30]}...")  # Print first 30 chars of query for debugging
+        except mysql.connector.Error as err:
+            print(f"Error executing query: {err}")
 
     # Commit the changes
     conn.commit()
     print("SQL queries executed successfully!")
 
-    # Close cursor and connection
-    cursor.close()
-    conn.close()
-
 except mysql.connector.Error as err:
     print(f"Error: {err}")
+
+finally:
+    # Close cursor and connection
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()
