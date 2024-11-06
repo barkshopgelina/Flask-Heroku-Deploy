@@ -13,7 +13,8 @@ db_config = {
     "password": url.password,  # Extract password
     "host": url.hostname,  # Extract hostname
     "port": url.port,  # Extract port
-    "database": url.path[1:]  # Extract database name (remove leading '/')
+    "database": url.path[1:],  # Extract database name (remove leading '/')
+    "raise_on_warnings": True  # Raise warnings if any, for better debugging
 }
 
 # Attempt to connect to the MySQL database
@@ -30,7 +31,11 @@ try:
     for query in sql_queries.split(";"):
         query = query.strip()  # Strip extra whitespace/newlines
         if query:  # Only execute non-empty queries
-            cursor.execute(query)
+            try:
+                cursor.execute(query)
+                print(f"Executed query: {query[:30]}...")  # Print first 30 chars of query for debugging
+            except mysql.connector.Error as err:
+                print(f"Error executing query: {err}")
 
     # Commit the changes
     conn.commit()
