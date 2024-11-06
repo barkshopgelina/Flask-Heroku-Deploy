@@ -39,6 +39,11 @@ try:
     queries = [q.strip() for q in sql_queries.split(';') if q.strip()]
     for query in queries:
         try:
+            # Check if the query creates a table or modifies the database schema
+            if "CREATE TABLE" in query:
+                # Make sure the table creation uses IF NOT EXISTS
+                query = query.replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS")
+            
             cursor.execute(query)
             print(f"Executed query: {query[:30]}...")  # Print first 30 chars of query for debugging
         except mysql.connector.Error as err:
