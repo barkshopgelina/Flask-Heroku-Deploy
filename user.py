@@ -23,7 +23,7 @@ def get_current_user():
     return user
 
 # home.html: Function to get projects based on year
-def get_projects(year=2023, results_per_page=10, page=1):
+def get_projects(year=2024, results_per_page=10, page=1):
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
     try:
@@ -196,7 +196,7 @@ def home():
     results_per_page = int(request.args.get('results_per_page', 10))
     page = int(request.args.get('page', 1))
 
-    projects, total_results = get_projects(year=2023, results_per_page=results_per_page, page=page)
+    projects, total_results = get_projects(year=2024, results_per_page=results_per_page, page=page)
 
     # Determine which projects are saved by the current user
     if 'username' in session:

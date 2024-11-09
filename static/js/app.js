@@ -106,19 +106,30 @@ $(document).ready(function() {
         }
     });
 
-    //Search box
     $('#search-box').on('input', function() {
         let query = $(this).val();
+        $('#suggestions').empty();  // Clear any previous suggestions or messages
+    
         if (query.length > 1) {
             $.ajax({
                 url: '/search',
                 method: 'GET',
                 data: { query: query },
                 success: function(data) {
-                    $('#suggestions').empty();
-                    data.forEach(function(item) {
-                        $('#suggestions').append('<div class="suggestion-item">' + item.Title + '</div>');
-                    });
+                    if (data.length === 0) {
+                        $('#suggestions').append('<div class="no-results">No projects found</div>');
+                        $('#search-btn').data('projects-found', false); // Set a flag if no results are found
+                    } else {
+                        $('#suggestions').empty(); // Clear any existing no-results message
+                        data.forEach(function(item) {
+                            $('#suggestions').append('<div class="suggestion-item">' + item.Title + '</div>');
+                        });
+                        $('#search-btn').data('projects-found', true); // Set a flag if results are found
+                    }
+                },
+                error: function() {
+                    $('#suggestions').append('<div class="no-results">Error fetching suggestions</div>');
+                    $('#search-btn').data('projects-found', false); // Set flag to false on error
                 }
             });
         } else {
@@ -126,13 +137,14 @@ $(document).ready(function() {
         }
     });
     
-    //Search button
+    // Search button
     $('#search-btn').on('click', function() {
         let query = $('#search-box').val();
-        if (query.length > 1) {
+        if (query.length > 1 && $('#search-btn').data('projects-found')) {
             window.location.href = '/project/' + encodeURIComponent(query);
         }
     });
+    
 
     $(document).on('click', '.suggestion-item', function() {
         let title = $(this).text();

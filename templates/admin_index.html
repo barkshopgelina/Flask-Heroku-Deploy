@@ -8,7 +8,7 @@
         <link rel="icon" href="{{ url_for('static', filename='images/tab_icon.png') }}" type="image/x-icon">
         <meta name="keywords" content="CapsArc, Capstone Project Repository, ASU-CCS Capstone Projects Portal, Information Technology Capstone, IMRaD Thesis Generator, Capstone Project Archive, Capstone Project Access">
         <meta name="Description" content="CAPSARC is an institutional repository for showcasing and accessing Bachelor of Science in Information Technology capstone projects, with an IMRaD generator for streamlined academic research management.">
-        <meta http-equiv="refresh" content="60">  <!-- Refresh every 60 seconds -->
+       
         
         <title>CapsArc: Admin Dashboard</title>
         <!-- Bootstrap Core CSS -->
@@ -195,9 +195,9 @@
                                                     <td>{{ project.Major }}</td>
                                                     <td>{{ project.Publication_Year }}</td>
                                                     <td class="center">
-                                                        <a class="btn btn-custom" href="{{ url_for('admin_view_project', project_id=project.project_id) }}">View</a>
-                                                        <a class="btn btn-info" href="{{ url_for('edit_project', project_id=project.project_id) }}">Edit</a>
-                                                        <input type="button" name="delete" value="Delete" class="btn btn-danger" onclick="confirmDelete('{{ project.project_id }}')">
+                                                        <a class="btn btn-custom" href="{{ url_for('admin_view_project', project_id=project.project_id) }}"> <i class="fa fa-eye"></i></a>
+                                                        <a class="btn btn-info" href="{{ url_for('edit_project', project_id=project.project_id) }}"><i class="fa fa-edit"></i></a>
+                                                        <a class="btn btn-danger"  value="delete" onclick="confirmDelete('{{ project.project_id }}')"><i class="fa fa-trash"></i></a>
                                                     </td>
                                                 </tr>
                                                 {% endfor %}

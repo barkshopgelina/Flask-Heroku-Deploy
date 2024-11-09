@@ -7,10 +7,24 @@ import google.generativeai as genai
 import fitz
 import bcrypt
 from datetime import datetime
+from google.oauth2 import service_account
+import google.generativeai as genai
 
-project_id = "imrad-generator-438711"
+# Set the path to your JSON credentials file
+credentials_file_path = "config/imrad-440802-a5d7eb00bddd.json"  # Replace with the correct path to your credentials JSON file
+
+# Create credentials from the JSON file
+credentials = service_account.Credentials.from_service_account_file(credentials_file_path)
+
+# Use the credentials with the genai module or any other Google API requiring authentication
+genai.configure(credentials=credentials)
+
+# Set up the model
+project_id = "imrad-440802"
 location = "us-central1"
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash-002")
+
+
 
 def update_last_active():
     conn = get_database_connection()
@@ -390,7 +404,7 @@ def edit_project(project_id):
     year = project.get('Publication_Year', None)
 
     # Generate a range of years (you can adjust this range as needed)
-    year_options = list(range(2021, 2024))
+    year_options = list(range(2021, 2025))
 
     return render_template('edit_project.html', project=project, year=year, year_options=year_options)
 
