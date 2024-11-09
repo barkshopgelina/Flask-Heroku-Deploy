@@ -1,0 +1,14 @@
+# Ignore node_modules directory
+node_modules/
+
+# Ignore log files
+*.log
+
+# Ignore all JSON files in static/js/ directory
+static/js/*.json
+
+# Ignore a specific file
+sensitive_data.json
+
+# Ignore all files with .env extension
+*.env
