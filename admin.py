@@ -16,16 +16,13 @@ import json
 credentials_info = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
 credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
-# Configure the genai client with the credentials
-genai.Client(credentials=credentials)
+# Configure the Google Generative AI client using the credentials
+genai.configure(api_key=credentials_info["private_key"])
 
-# Model setup parameters
+# Set your model parameters
 project_id = "imrad-440802"
 location = "us-central1"
 model_id = "gemini-1.5-flash-002"
-
-# Initialize the generative model
-model = genai.GenerativeModel(model_id=model_id, location=location)
 
 def update_last_active():
     conn = get_database_connection()
