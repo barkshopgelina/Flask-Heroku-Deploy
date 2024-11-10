@@ -283,12 +283,12 @@ def generate_imrad(text):
         # Generate content using the model
         response = genai.generate_content(model=model_id, prompt=f"{prompt}: {text}")
         
-        # Check the response content
-        if response and hasattr(response, 'text'):
-            print(f"Generated IMRaD text: {response.text}")  # Add debugging log
+        # Check the response
+        if response and hasattr(response, 'text') and response.text.strip():  # Ensure it's not empty
+            print(f"Generated IMRaD text: {response.text}")  # Debug: Output IMRaD text
             return response.text
         else:
-            print("No valid response from the model.")
+            print("Received empty or invalid response from the model.")
             return None
 
     except Exception as e:
@@ -299,10 +299,9 @@ def generate_imrad(text):
 
 def save_generated_imrad_and_spacing(title, imrad_text):
     try:
-        # Ensure imrad_text is valid and not None
         if not imrad_text:
-            return "Invalid IMRaD text"
-
+            return "Invalid IMRaD text: Generated text is empty."
+        
         # Replace line breaks with <br> tags for proper HTML rendering
         imrad_with_spacing = imrad_text.replace("\n", "<br>")
 
@@ -328,7 +327,6 @@ def save_generated_imrad_and_spacing(title, imrad_text):
     
     except Exception as e:
         return f"Error saving IMRaD to database: {str(e)}"
-
 
 
 def save_pdf_to_db(title, authors, major, year, keywords, abstract, file):
