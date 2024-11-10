@@ -11,18 +11,7 @@ from google.oauth2 import service_account
 import google.generativeai as genai
 import os
 import json
-
-# Load credentials from the environment variable
-credentials_info = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
-credentials = service_account.Credentials.from_service_account_info(credentials_info)
-
-# Configure the Google Generative AI client using the credentials
-genai.configure(api_key=credentials_info["private_key"])
-
-# Set your model parameters
-project_id = "imrad-440802"
-location = "us-central1"
-model_id = "gemini-1.5-flash-002"
+import base64
 
 def update_last_active():
     conn = get_database_connection()
@@ -271,11 +260,37 @@ def extract_text_from_pdf(file):
         return f"Error extracting text: {str(e)}"
 
 def generate_imrad(text):
-    # Use a single prompt to generate the IMRaD format
-    prompt = "Summarize the PDF in IMRaD(Introduction, Method, Results, and Discussion) format. Make it in only 4 paragraphs and make each paragraph long and don't include words like 'Introduction', 'Method', 'Results', and 'Discussion'. Make each paragraph long."
-    response = model.generate_content(f"{prompt}: {text}")
-    
-    return response.text
+    try:
+        # Decode the base64-encoded Google credentials
+        credentials_base64 = os.getenv("GOOGLE_CREDENTIALS")
+        credentials_info = json.loads(base64.b64decode(credentials_base64).decode("utf-8"))
+        
+        # Load the credentials from the JSON string
+        credentials = service_account.Credentials.from_service_account_info(credentials_info)
+        
+        # Configure the generative AI client using the credentials
+        genai.configure(credentials=credentials)
+        
+        # Set model parameters
+        model_id = "gemini-1.5-flash-002"  # Replace with your model's ID
+        
+        # Define the prompt for generating the IMRaD summary
+        prompt = (
+            "Summarize the PDF in IMRaD (Introduction, Method, Results, and Discussion) format. "
+            "Make it in only 4 paragraphs and make each paragraph long and don't include words like "
+            "'Introduction', 'Method', 'Results', and 'Discussion'. Make each paragraph long."
+        )
+        
+        # Generate content using the model
+        response = genai.generate_content(model=model_id, prompt=f"{prompt}: {text}")
+        
+        # Return the result (adjust the response attribute based on the actual API response)
+        return response.text  # Verify if it's `response.text` or another attribute like `response['text']`
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
 
 def save_generated_imrad_and_spacing(title, imrad_text):
     try:

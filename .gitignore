@@ -12,3 +12,4 @@ sensitive_data.json
 
 # Ignore all files with .env extension
 *.env
+
