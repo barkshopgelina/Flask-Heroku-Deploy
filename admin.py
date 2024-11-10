@@ -9,22 +9,23 @@ import bcrypt
 from datetime import datetime
 from google.oauth2 import service_account
 import google.generativeai as genai
+import os
+import json
 
-# Set the path to your JSON credentials file
-credentials_file_path = "config/imrad-440802-a5d7eb00bddd.json"  # Replace with the correct path to your credentials JSON file
+# Load credentials from the environment variable
+credentials_info = json.loads(os.getenv("GOOGLE_CREDENTIALS"))
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
-# Create credentials from the JSON file
-credentials = service_account.Credentials.from_service_account_file(credentials_file_path)
+# Configure the genai client with the credentials
+genai.Client(credentials=credentials)
 
-# Use the credentials with the genai module or any other Google API requiring authentication
-genai.configure(credentials=credentials)
-
-# Set up the model
+# Model setup parameters
 project_id = "imrad-440802"
 location = "us-central1"
-model = genai.GenerativeModel("gemini-1.5-flash-002")
+model_id = "gemini-1.5-flash-002"
 
-
+# Initialize the generative model
+model = genai.GenerativeModel(model_id=model_id, location=location)
 
 def update_last_active():
     conn = get_database_connection()
