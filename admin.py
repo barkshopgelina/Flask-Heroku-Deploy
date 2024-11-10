@@ -244,7 +244,6 @@ def upload_project():
     return render_template("upload_project.html")
 
 
-
 def extract_text_from_pdf(file):
     try:
         pdf_document = fitz.open(stream=file.read(), filetype="pdf")
@@ -258,7 +257,7 @@ def extract_text_from_pdf(file):
     
     except Exception as e:
         return f"Error extracting text: {str(e)}"
-
+    
 def generate_imrad(text):
     try:
         # Decode the base64-encoded Google credentials
@@ -284,12 +283,18 @@ def generate_imrad(text):
         # Generate content using the model
         response = genai.generate_content(model=model_id, prompt=f"{prompt}: {text}")
         
-        # Return the result (adjust the response attribute based on the actual API response)
-        return response.text  # Verify if it's `response.text` or another attribute like `response['text']`
+        # Check the response content
+        if response and hasattr(response, 'text'):
+            print(f"Generated IMRaD text: {response.text}")  # Add debugging log
+            return response.text
+        else:
+            print("No valid response from the model.")
+            return None
 
     except Exception as e:
         print(f"An error occurred: {e}")
         return None
+
 
 
 def save_generated_imrad_and_spacing(title, imrad_text):
