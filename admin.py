@@ -294,6 +294,10 @@ def generate_imrad(text):
 
 def save_generated_imrad_and_spacing(title, imrad_text):
     try:
+        # Ensure imrad_text is valid and not None
+        if not imrad_text:
+            return "Invalid IMRaD text"
+
         # Replace line breaks with <br> tags for proper HTML rendering
         imrad_with_spacing = imrad_text.replace("\n", "<br>")
 
@@ -319,6 +323,7 @@ def save_generated_imrad_and_spacing(title, imrad_text):
     
     except Exception as e:
         return f"Error saving IMRaD to database: {str(e)}"
+
 
 
 def save_pdf_to_db(title, authors, major, year, keywords, abstract, file):
