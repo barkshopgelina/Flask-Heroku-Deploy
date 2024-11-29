@@ -60,16 +60,19 @@
                 <div class="form-group">
                     <label for="course">Course:</label>
                     <select id="course" name="course">
-                        <option value="Bachelor of Science in Information Technology" {% if user.course == "Bachelor of Science in Information Technology" %}selected{% endif %}>Bachelor of Science in Information Technology</option>
-                    </select>
+                        <option value=1 {% if user.course_ID == 1 %}selected{% endif %}>Bachelor of Science in Information Technology</option>
+                        <option value=2 {% if user.course_ID == 2 %}selected{% endif %}>Bachelor of Science in Information System</option>
+                        <option value=3 {% if user.course_ID == 3 %}selected{% endif %}>Bachelor of Science in Entertainment and Multimedia Computing</option>
+                        </select>
                 </div>
                 <div class="form-group">
                     <label for="major">Major:</label>
                     <select id="major" name="major">
-                        <option value="SE" {% if user.major == "SE" %}selected{% endif %}>Software Engineering</option>
-                        <option value="IST" {% if user.major == "IST" %}selected{% endif %}>Instructional Systems Technology</option>
-                        <option value="HN" {% if user.major == "HN" %}selected{% endif %}>Computer Hardware and Networking Technologies</option>
-                        <option value="SMBPO" {% if user.major == "SMBPO" %}selected{% endif %}>Service Management- Business Process Outsourcing</option>
+                        <option value=1 {% if user.major_ID == 1 %}selected{% endif %}>Software Engineering</option>
+                        <option value=2 {% if user.major_ID == 2 %}selected{% endif %}>Instructional Systems Technology</option>
+                        <option value=3 {% if user.major_ID == 3 %}selected{% endif %}>Computer Hardware and Networking Technologies</option>
+                        <option value=4 {% if user.major_ID == 4 %}selected{% endif %}>Service Management- Business Process Outsourcing</option>
+                        <option value=5 {% if user.major_ID == 5 %}selected{% endif %}>N/A</option>
                     </select>
                 </div>
                 <div class="form-group">

@@ -9,9 +9,20 @@ import bcrypt
 from datetime import datetime
 from google.oauth2 import service_account
 import google.generativeai as genai
-import os
-import json
-import base64
+
+# Set the path to your JSON credentials file
+credentials_file_path = "config/generator-441311-f6c4bae822dc.json"  # Replace with the correct path to your credentials JSON file
+
+# Create credentials from the JSON file
+credentials = service_account.Credentials.from_service_account_file(credentials_file_path)
+
+# Use the credentials with the genai module or any other Google API requiring authentication
+genai.configure(credentials=credentials)
+
+# Set up the model
+project_id = "generator-441311"
+location = "us-central1"
+model = genai.GenerativeModel("gemini-1.5-flash-002")
 
 def update_last_active():
     conn = get_database_connection()
@@ -31,8 +42,11 @@ def admin_index():
     cursor = conn.cursor(dictionary=True)
 
     try:
-        cursor.execute('SELECT COUNT(*) FROM project_details;')
+        cursor.execute('SELECT COUNT(*) FROM project_details WHERE is_deleted = FALSE;')
         count_projects = cursor.fetchone()['COUNT(*)']
+
+        cursor.execute('SELECT COUNT(*) FROM project_details WHERE is_deleted = TRUE;')
+        count_archive_projects = cursor.fetchone()['COUNT(*)']
 
         cursor.execute("SELECT COUNT(*) FROM users WHERE status = 'active';")
         count_active_users = cursor.fetchone()['COUNT(*)']
@@ -41,31 +55,51 @@ def admin_index():
         count_users = cursor.fetchone()['COUNT(*)']
 
         cursor.execute('''
-            SELECT 
-                project_details.project_id, 
-                project_details.Title, 
-                project_details.Authors, 
-                project_details.Major, 
-                project_details.Publication_Year, 
-                COUNT(user_library.project_id) AS save_count
-            FROM user_library
-            JOIN project_details ON user_library.project_id = project_details.project_id
-            GROUP BY project_details.project_id
-            ORDER BY save_count DESC;
-        ''')
+        SELECT 
+            project_details.project_id, 
+            project_details.Title, 
+            project_details.Authors, 
+            course.course_code, 
+            major.major_code, 
+            project_details.Publication_Year, 
+            COUNT(user_library.project_id) AS save_count
+        FROM 
+            project_details
+        JOIN 
+            course 
+            ON project_details.course_id = course.course_id
+        JOIN 
+            major 
+            ON project_details.major_id = major.major_id
+        INNER JOIN 
+            user_library 
+            ON user_library.project_id = project_details.project_id
+        WHERE 
+            project_details.is_deleted = FALSE  -- Exclude archived projects
+        GROUP BY 
+            project_details.project_id, 
+            project_details.Title, 
+            project_details.Authors, 
+            course.course_code, 
+            major.major_code, 
+            project_details.Publication_Year
+        ORDER BY 
+            save_count DESC;
+    ''')
+
         projects = cursor.fetchall()
     finally:
         cursor.close()
         conn.close()
     
-    return render_template('admin_index.html', count_projects=count_projects, count_active_users=count_active_users, count_users=count_users, projects=projects)
+    return render_template('admin_index.html', count_projects=count_projects, count_archive_projects=count_archive_projects, count_active_users=count_active_users, count_users=count_users, projects=projects)
 
 
 def admin_view_project(project_id):
     project = get_project_details(project_id)
     if not project:
         flash('Project not found.', 'danger')
-        return redirect(url_for('capstone_projects'))
+        return redirect(url_for('library'))
         
     # Generate the URL to view the PDF
     pdf_url = url_for('view_pdf', identifier=project_id)
@@ -86,14 +120,53 @@ def view_pdf(identifier):
     else:
         abort(404, description="PDF file not found.")
     
-def capstone_projects():
+def library():
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            project_details.*, 
+            course.course_code, 
+            major.major_code
+        FROM 
+            project_details
+        JOIN 
+            course 
+            ON project_details.course_id = course.course_id
+        JOIN 
+            major 
+            ON project_details.major_id = major.major_id
+        WHERE 
+            project_details.is_deleted = FALSE
+    """)
 
-    cursor.execute('SELECT * FROM project_details;')
     projects = cursor.fetchall()
   
     return render_template('capstone_projects.html', projects=projects)
+
+def archive():
+    conn = get_database_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT 
+            project_details.*, 
+            course.course_code, 
+            major.major_code
+        FROM 
+            project_details
+        JOIN 
+            course 
+            ON project_details.course_id = course.course_id
+        LEFT JOIN 
+            major 
+            ON project_details.major_id = major.major_id
+        WHERE 
+            project_details.is_deleted = TRUE
+    """)
+    projects = cursor.fetchall()
+  
+    return render_template('archive.html', projects=projects)
 
 def update_last_active():
     if 'user_id' in session:
@@ -114,7 +187,24 @@ def active_users():
     cursor = conn.cursor(dictionary=True)
 
     # Query to get active users with their last active timestamp
-    cursor.execute("SELECT * FROM users WHERE status = 'active' ORDER BY last_active DESC")
+    cursor.execute('''
+        SELECT 
+            users.*, 
+            course.course_code, 
+            major.major_code
+        FROM 
+            users
+        JOIN 
+            major 
+            ON users.major_ID = major.major_ID
+        JOIN 
+            course 
+            ON users.course_ID = course.course_ID
+        WHERE 
+            status = 'active' 
+        ORDER BY 
+            last_active DESC
+    ''')
     active_users = cursor.fetchall()
 
     cursor.close()
@@ -128,7 +218,20 @@ def users():
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute('SELECT * FROM users;')
+    cursor.execute('''
+        SELECT 
+            users.*, 
+            course.course_code, 
+            major.major_code
+        FROM 
+            users
+        JOIN 
+            major 
+            ON users.major_ID = major.major_ID
+        JOIN 
+            course 
+            ON users.course_ID = course.course_ID;
+    ''')
     users = cursor.fetchall()
   
     return render_template('users.html', users=users)
@@ -158,19 +261,78 @@ def reset_password(user_id):
         flash('Password reset successfully.', 'info')
     return render_template('reset_password.html', users=users)
 
-def delete_capstone_project():
+def restore_project_in_db(project_id):
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
-    project_id = request.form['project_id']
 
     try:
-        cursor.execute("DELETE FROM project_details WHERE project_id = %s", (project_id,))
+        # Check if the project exists in the `project_details` table and is archived
+        cursor.execute("SELECT * FROM project_details WHERE project_id = %s AND is_deleted = TRUE", (project_id,))
+        project = cursor.fetchone()
+
+        if not project:
+            return jsonify({'status': 'error', 'message': 'Project not found or already active'}), 404
+
+        # Restore the project by setting is_deleted to FALSE
+        cursor.execute("UPDATE project_details SET is_deleted = FALSE WHERE project_id = %s", (project_id,))
         conn.commit()
-        cursor.close()
-        return jsonify({'status': 'success'}), 200
+
+        return jsonify({'status': 'success', 'message': 'Project restored successfully'}), 200
+
     except Exception as e:
-        print(e)
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        print(f"Error: {e}")  # Log error for debugging
+        conn.rollback()  # Rollback transaction on error
+        return jsonify({'status': 'error', 'message': 'An internal server error occurred'}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def restore_project_route():
+    data = request.json
+    project_id = data.get('project_id')
+
+    if not project_id:
+        return jsonify({'status': 'error', 'message': 'Project ID is required'}), 400
+
+    # Call the renamed function and pass project_id
+    return restore_project_in_db(project_id)
+
+def archive_project():
+    conn = get_database_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Parse JSON data from the request
+        data = request.json
+        project_id = data.get('project_id')
+
+        if not project_id:
+            return jsonify({'status': 'error', 'message': 'Project ID is required'}), 400
+
+        # Check if the project exists
+        cursor.execute("SELECT * FROM project_details WHERE project_id = %s AND is_deleted = FALSE", (project_id,))
+        project = cursor.fetchone()
+
+        if not project:
+            return jsonify({'status': 'error', 'message': 'Project not found'}), 404
+
+        # Archive the project by setting is_deleted to TRUE
+        cursor.execute("UPDATE project_details SET is_deleted = TRUE WHERE project_id = %s", (project_id,))
+        conn.commit()
+
+        return jsonify({'status': 'success', 'message': 'Project archived successfully'}), 200
+
+    except Exception as e:
+        print(f"Error: {e}")  # Log the error for debugging
+        conn.rollback()  # Rollback the transaction on error
+        return jsonify({'status': 'error', 'message': 'An internal server error occurred'}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
 
 def delete_user():
     conn = get_database_connection()
@@ -203,16 +365,24 @@ def upload_project():
         # Get form data
         title = request.form["title"]
         authors = request.form["authors"]
+        course = request.form["course"]
         major = request.form["major"]
         year = request.form["year"]
         keywords = request.form["keywords"]
         abstract = request.form["abstract"]
 
         query = """
-        SELECT COUNT(*) FROM project_details
-        WHERE Title = %s AND Authors = %s AND Publication_Year = %s AND Keywords = %s AND Abstract = %s
+            SELECT COUNT(*) FROM project_details
+            WHERE Title = %s 
+            AND Authors = %s 
+            AND course_ID = %s 
+            AND major_ID = %s 
+            AND Publication_Year = %s 
+            AND Keywords = %s 
+            AND Abstract = %s
         """
-        cursor.execute(query, (title, authors, year, keywords, abstract))
+
+        cursor.execute(query, (title, authors, course, major, year, keywords, abstract))
         project_exists = cursor.fetchone()[0]
 
         if project_exists:
@@ -224,7 +394,7 @@ def upload_project():
         text = extract_text_from_pdf(file)
 
         # Save the capstone project details and PDF to the database
-        save_result = save_pdf_to_db(title, authors, major, year, keywords, abstract, file)
+        save_result = save_pdf_to_db(title, authors, course, major, year, keywords, abstract, file)
         if save_result != "Success":
             return save_result
 
@@ -243,7 +413,6 @@ def upload_project():
 
     return render_template("upload_project.html")
 
-
 def extract_text_from_pdf(file):
     try:
         pdf_document = fitz.open(stream=file.read(), filetype="pdf")
@@ -257,51 +426,15 @@ def extract_text_from_pdf(file):
     
     except Exception as e:
         return f"Error extracting text: {str(e)}"
-    
+
 def generate_imrad(text):
-    try:
-        # Decode the base64-encoded Google credentials
-        credentials_base64 = os.getenv("GOOGLE_CREDENTIALS")
-        credentials_info = json.loads(base64.b64decode(credentials_base64).decode("utf-8"))
-        
-        # Load the credentials from the JSON string
-        credentials = service_account.Credentials.from_service_account_info(credentials_info)
-        
-        # Configure the generative AI client using the credentials
-        genai.configure(credentials=credentials)
-        
-        # Set model parameters
-        model_id = "gemini-1.5-flash-002"  # Replace with your model's ID
-        
-        # Define the prompt for generating the IMRaD summary
-        prompt = (
-            "Summarize the PDF in IMRaD (Introduction, Method, Results, and Discussion) format. "
-            "Make it in only 4 paragraphs and make each paragraph long and don't include words like "
-            "'Introduction', 'Method', 'Results', and 'Discussion'. Make each paragraph long."
-        )
-        
-        # Generate content using the model
-        response = genai.generate_content(model=model_id, prompt=f"{prompt}: {text}")
-        
-        # Check the response
-        if response and hasattr(response, 'text') and response.text.strip():  # Ensure it's not empty
-            print(f"Generated IMRaD text: {response.text}")  # Debug: Output IMRaD text
-            return response.text
-        else:
-            print("Received empty or invalid response from the model.")
-            return None
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None
-
-
+    prompt = "Summarize the attached PDF in IMRaD format (Introduction, Method, Results, and Discussion) without using section headers like 'Introduction,' 'Method,' 'Results,' and 'Discussion.' Structure the summary in detailed paragraphs, with each paragraph being long enough to fill at least one full page of a 5-page, short coupon bond. Ensure each paragraph is dense with information, capturing key points and details that are critical to understanding the study's background, research methodology, core findings, and implications or analysis. Include any specific terminology, data, or notable quotes from the original text to ensure that each section is comprehensive and maintains the depth of the original work. Do not limit the generated IMRaD format into 4 paragraphs only."
+    response = model.generate_content(f"{prompt}: {text}")
+    
+    return response.text
 
 def save_generated_imrad_and_spacing(title, imrad_text):
     try:
-        if not imrad_text:
-            return "Invalid IMRaD text: Generated text is empty."
-        
         # Replace line breaks with <br> tags for proper HTML rendering
         imrad_with_spacing = imrad_text.replace("\n", "<br>")
 
@@ -327,9 +460,29 @@ def save_generated_imrad_and_spacing(title, imrad_text):
     
     except Exception as e:
         return f"Error saving IMRaD to database: {str(e)}"
+    
+def generate_citation_authors(authors):
+    """Generate formatted authors for citation using AI."""
+    prompt = (
+        f"Format the following list of authors for citation purposes. "
+        f"Format the names as follows: Last name, followed by a comma, then the first name initial and middle initial (each followed by a period). Add a comma after each author's name except the last one. Include an ampersand (&) before the final author's name. If an author has multiple first names, represent each with an initial and include all initials."
+        f"Authors: {authors}"
+    )
+    response = model.generate_content(prompt)
+    return response.text.strip()
+
+def generate_citation_title(title):
+    """Generate formatted title for citation using AI."""
+    prompt = (
+        f"Format the following title for citation in APA style. Enclose the title in double quotes. the Title of the work should be written in sentence case."
+        f"Title: {title}"
+    )
+    response = model.generate_content(prompt)
+    return response.text.strip()
 
 
-def save_pdf_to_db(title, authors, major, year, keywords, abstract, file):
+def save_pdf_to_db(title, authors, course, major, year, keywords, abstract, file):
+    """Save PDF and project details into the database."""
     try:
         connection = get_database_connection()
         if connection is None:
@@ -340,22 +493,29 @@ def save_pdf_to_db(title, authors, major, year, keywords, abstract, file):
         file.seek(0)
         file_data = file.read()
 
+        # Generate Citation_Title and Citation_Authors using AI
+        citation_authors = generate_citation_authors(authors)
+        citation_title = generate_citation_title(title)
+
         query = """
-        INSERT INTO project_details (Title, Authors, Publication_Year, Major, Keywords, Abstract, pdf_file) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO project_details (
+            Title, Authors, Publication_Year, course_ID, major_ID, Keywords, Abstract, 
+            pdf_file, Citation_Authors, Citation_Title
+        ) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (title, authors, year, major, keywords, abstract, file_data))
+        cursor.execute(query, (title, authors, year, course, major, keywords, abstract, file_data, citation_authors, citation_title))
 
         connection.commit()
         cursor.close()
         connection.close()
-        
+
         return "Success"
     
     except Exception as e:
         return f"Error saving PDF to database: {str(e)}"
 
-    
+
 # Route for editing a project
 def edit_project(project_id):
     project = get_project_details(project_id)  # Fetch the project details from the database using the ID
@@ -364,12 +524,13 @@ def edit_project(project_id):
 
     if not project:
         flash('Project not found.', 'danger')
-        return redirect(url_for('capstone_projects'))
+        return redirect(url_for('library'))
 
     if request.method == 'POST':
         # Collect updated project details from the form
         title = request.form.get('title')
         authors = request.form.get('authors')
+        course = request.form.get('course')
         major = request.form.get('major')
         year = request.form.get('year')
         keywords = request.form.get('keywords')
@@ -380,10 +541,17 @@ def edit_project(project_id):
 
         # Check if the project already exists
         query = """
-        SELECT COUNT(*) FROM project_details
-        WHERE Title = %s AND Authors = %s AND Publication_Year = %s AND Keywords = %s AND Abstract = %s
-        """
-        cursor.execute(query, (title, authors, year, keywords, abstract))
+            SELECT COUNT(*) FROM project_details
+            WHERE Title = %s 
+            AND Authors = %s 
+            AND course_ID = %s 
+            AND major_ID = %s 
+            AND Publication_Year = %s 
+            AND Keywords = %s 
+            AND Abstract = %s
+            """
+
+        cursor.execute(query, (title, authors, course, major, year, keywords, abstract))
         project_exists = cursor.fetchone()[0]
 
         if project_exists:
@@ -406,7 +574,8 @@ def edit_project(project_id):
             'pdf_file': pdf_data,
             'Title': title,
             'Authors': authors,
-            'Major': major,
+            'course_ID': course,
+            'major_ID': major,
             'Publication_Year': year,
             'Keywords': keywords,
             'Abstract': abstract
@@ -435,13 +604,14 @@ def update_project_details(project_details):
     cursor = conn.cursor()
 
     try:
-        # Update query to modify the project details in the database
+        # Corrected update query
         sql = '''UPDATE project_details
                  SET pdf_file = %s,
                      Title = %s,
                      Authors = %s,
                      Publication_Year = %s,
-                     Major = %s,
+                     course_ID = %s,
+                     major_ID = %s,
                      Keywords = %s,
                      Abstract = %s
                  WHERE project_id = %s'''
@@ -452,7 +622,8 @@ def update_project_details(project_details):
             project_details['Title'],
             project_details['Authors'],
             project_details['Publication_Year'],
-            project_details['Major'],
+            project_details['course_ID'],
+            project_details['major_ID'],
             project_details['Keywords'],
             project_details['Abstract'],
             project_details['project_id']
@@ -460,10 +631,9 @@ def update_project_details(project_details):
         
         # Commit the changes
         conn.commit()
-        
         return True  # Indicate success
     except Exception as e:
-        # Log the error (optional) and handle it
+        # Log the error for debugging
         print(f"Error updating project details: {e}")
         conn.rollback()
         return False  # Indicate failure

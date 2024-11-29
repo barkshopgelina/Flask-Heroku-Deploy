@@ -45,12 +45,11 @@
                 <input type="text" name="query" placeholder="Title, Authors, Keywords" class="title-auth-key">
                 <input type="number" class="year" name="Publication_Year_From" placeholder="Year"> -
                 <input type="number" class="year" name="Publication_Year_To" placeholder="Year">
-                <select name="Major" id="Major">
-                    <option value="">--Major--</option>
-                    <option value="SE">SE</option>
-                    <option value="IST">IST</option>
-                    <option value="HN">HN</option>
-                    <option value="BPO">BPO</option>
+                <select name="course_ID" id="course_ID">
+                    <option value="" disabled="" selected="">-Course-</option>
+                    <option value=1>BSINFOTECH</option>
+                    <option value=2>BSIS</option>
+                    <option value=3>BSEMC</option>
                 </select>
                 <button type="submit">Search</button>
             </form>
@@ -82,7 +81,7 @@
                         </div>
                         <div class="project-info">
                             <h4><a class="project-title" href="/project/{{ project.project_id }}">{{ project.Title }}</a></h4>                
-                            <p class="authors">{{ project.Authors }}, {{ project.Major }} ({{ project.Publication_Year }})</p>
+                            <p class="authors">{{ project.Citation_Authors }}, {{ project.Publication_Year }} - {{ project.course_code }} {{ project.major_code }}</p>
                             <p class="keywords">{{ project.Keywords }}</p>
                             <div class="content-wrapper">
                                 <p class="content">{{ project.Abstract }}</p>

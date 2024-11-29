@@ -11,7 +11,21 @@ def get_current_user():
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+        cursor.execute("""
+        SELECT 
+            u.*, 
+            c.course_name, 
+            m.major_name
+        FROM 
+            users u
+        LEFT JOIN 
+            course c ON u.course_ID = c.course_ID
+        LEFT JOIN 
+            major m ON u.major_ID = m.major_ID
+        WHERE 
+            u.username = %s
+    """, (username,))
+
         user = cursor.fetchone()
         if user and 'profile_picture_url' in user and user['profile_picture_url']:
             user['profile_picture'] = url_for('static', filename=user['profile_picture_url'])
@@ -27,7 +41,8 @@ def get_projects(year=2024, results_per_page=10, page=1):
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        query = "SELECT * FROM project_details WHERE Publication_Year = %s"
+        query = "SELECT pd.*, c.course_code, m.major_code FROM project_details pd JOIN course c ON pd.course_ID = c.course_ID JOIN major m ON pd.major_ID = m.major_ID WHERE Publication_Year = %s AND is_deleted = FALSE"
+
         cursor.execute(query, (year,))
         projects = cursor.fetchall()
         
@@ -44,15 +59,26 @@ def get_projects(year=2024, results_per_page=10, page=1):
 # home.html: Search Bar with dropdown suggestion (Title)
 def search_projects(query):
     conn = get_database_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True)  # Use dictionary=True for key-value results
     try:
         search_query = f"%{query}%"
-        cursor.execute("SELECT title as Title FROM project_details WHERE Title LIKE %s", (search_query,))
+        cursor.execute("""
+            SELECT 
+                pd.Title
+            FROM 
+                project_details pd
+            WHERE 
+                pd.Title LIKE %s AND pd.is_deleted = FALSE
+        """, (search_query,))
+        
         suggestions = cursor.fetchall()
     finally:
         cursor.close()
         conn.close()
+    
+    # Return the result as JSON
     return suggestions
+
 
 # project_details.html: Display the projects details of a capstone project once the link title is clicked.
 def get_project_details(identifier):
@@ -61,9 +87,41 @@ def get_project_details(identifier):
     try:
         try:
             project_id = int(identifier)
-            cursor.execute("SELECT * FROM project_details WHERE project_id = %s", (project_id,))
+            cursor.execute("""
+                SELECT 
+                    project_details.*, 
+                    course.course_name, 
+                    major.major_name
+                FROM 
+                    project_details
+                JOIN 
+                    course 
+                    ON project_details.course_ID = course.course_ID
+                JOIN 
+                    major 
+                    ON project_details.major_ID = major.major_ID
+                WHERE 
+                    project_details.project_id = %s
+            """, (project_id,))
+
         except ValueError:
-            cursor.execute("SELECT * FROM project_details WHERE Title = %s", (identifier,))
+            cursor.execute("""
+                SELECT 
+                    project_details.*, 
+                    course.course_code, 
+                    major.major_code
+                FROM 
+                    project_details
+                JOIN 
+                    course 
+                    ON project_details.course_ID = course.course_ID
+                JOIN 
+                    major 
+                    ON project_details.major_ID = major.major_ID
+                WHERE 
+                    project_details.Title = %s
+            """, (identifier,))
+
         project = cursor.fetchone()
     finally:
         cursor.close()
@@ -72,41 +130,70 @@ def get_project_details(identifier):
 
 
 # Function to get filtered projects based on search criteria
-def get_filtered_projects(query=None, year_from=None, year_to=None, major=None, abstract=None, results_per_page=10, page=1):
+def get_filtered_projects(query=None, year_from=None, year_to=None, course=None, abstract=None, cit_auth=None, results_per_page=10, page=1):
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        base_query = "SELECT * FROM project_details WHERE 1=1"
+        base_query = """
+            SELECT 
+                pd.*, 
+                c.course_code, 
+                m.major_code,
+                m.major_name 
+            FROM 
+                project_details pd
+            JOIN 
+                course c 
+                ON pd.course_ID = c.course_ID
+            JOIN 
+                major m 
+                ON pd.major_ID = m.major_ID
+            WHERE 
+                pd.is_deleted = FALSE
+        """
         params = []
 
         if query:
-            base_query += " AND (Title LIKE %s OR Authors LIKE %s OR Keywords LIKE %s)"
-            params.extend([f"%{query}%", f"%{query}%", f"%{query}%"])
+            base_query += " AND (pd.Title LIKE %s OR pd.Authors LIKE %s OR pd.Keywords LIKE %s OR m.major_code LIKE %s OR m.major_name LIKE %s)"
+            params.extend([f"%{query}%", f"%{query}%", f"%{query}%", f"%{query}%",  f"%{query}%"])
         if year_from:
-            base_query += " AND Publication_Year >= %s"
+            base_query += " AND pd.Publication_Year >= %s"
             params.append(year_from)
         if year_to:
-            base_query += " AND Publication_Year <= %s"
+            base_query += " AND pd.Publication_Year <= %s"
             params.append(year_to)
-        if major:
-            base_query += " AND Major = %s"
-            params.append(major)
+        if course:
+            base_query += " AND pd.course_ID = %s"
+            params.append(course)
         if abstract:
-            base_query += " AND Abstract LIKE %s"
+            base_query += " AND pd.Abstract LIKE %s"
             params.append(f"%{abstract}%")
-        
-        cursor.execute(base_query, params)
-        results = cursor.fetchall()
-        
-        total_results = len(results)
+        if cit_auth:
+            base_query += " AND pd.Citation_Authors LIKE %s"
+            params.append(f"%{cit_auth}%")
+
+        # Add pagination
         start = (page - 1) * results_per_page
-        end = start + results_per_page
-        paginated_results = results[start:end]
+        base_query += " LIMIT %s OFFSET %s"
+        params.extend([results_per_page, start])
+
+        cursor.execute(base_query, params)
+        projects = cursor.fetchall()
+
+        # Get the total count
+        count_query = """
+            SELECT COUNT(*) AS total 
+            FROM project_details pd
+            WHERE pd.is_deleted = FALSE
+        """
+        cursor.execute(count_query)
+        total_results = cursor.fetchone()["total"]
     finally:
         cursor.close()
         conn.close()
-    
-    return paginated_results, total_results
+
+    return projects, total_results
+
 
 # Function to save project details to user's library, avoiding duplication
 def save_project_to_library(project_id):
@@ -145,24 +232,54 @@ def get_user_projects(user_id, results_per_page=10, page=1):
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT COUNT(*) as total FROM user_library WHERE user_id = %s", (user_id,))
+        # Step 1: Get the total number of results
+        cursor.execute("""
+            SELECT COUNT(*) AS total
+            FROM user_library ul
+            JOIN project_details pd ON ul.project_id = pd.project_id
+            WHERE ul.user_id = %s AND pd.is_deleted = FALSE
+        """, (user_id,))
         total_results = cursor.fetchone()['total']
-        
+
+        # Step 2: Paginate results
         start = (page - 1) * results_per_page
-        query = """
-            SELECT ul.lib_id, ul.timestamp, pd.* 
-            FROM user_library ul 
-            JOIN project_details pd ON ul.project_id = pd.project_id 
-            WHERE ul.user_id = %s 
+        cursor.execute("""
+            SELECT 
+                ul.lib_id, 
+                ul.timestamp, 
+                pd.project_id,
+                pd.Title,
+                pd.Citation_Authors, 
+                c.course_code,
+                m.major_code,
+                pd.Keywords,        
+                pd.Publication_Year,
+                pd.Abstract
+            FROM 
+                user_library ul
+            JOIN 
+                project_details pd 
+                ON ul.project_id = pd.project_id
+            JOIN 
+                course c 
+                ON pd.course_ID = c.course_ID
+            JOIN 
+                major m 
+                ON pd.major_ID = m.major_ID
+            WHERE 
+                ul.user_id = %s AND pd.is_deleted = FALSE
             LIMIT %s OFFSET %s
-        """
-        cursor.execute(query, (user_id, results_per_page, start))
+        """, (user_id, results_per_page, start))
+
+
         projects = cursor.fetchall()
+
     finally:
         cursor.close()
         conn.close()
 
     return projects, total_results
+
 
 # Function to delete a saved project from user's library
 def delete_project_from_library(entry_id):
@@ -183,9 +300,6 @@ def delete_project_from_library(entry_id):
                 cursor.close()
                 conn.close()
     return False
-
-
-
 
 #ROUTES
 def index():
@@ -251,14 +365,16 @@ def browse():
     query = request.args.get('query')
     year_from = request.args.get('Publication_Year_From')
     year_to = request.args.get('Publication_Year_To')
-    major = request.args.get('Major')
+    course = request.args.get('course_ID')
+    abstract = request.args.get('Keywords')
     abstract = request.args.get('Abstract')
+    cit_auth = request.args.get('Citation_Authors')
     results_per_page = int(request.args.get('results_per_page', 10))
     page = int(request.args.get('page', 1))
 
     # Fetch filtered projects
     projects, total_results = get_filtered_projects(
-         query=query, year_from=year_from, year_to=year_to, major=major,
+        query=query, year_from=year_from, year_to=year_to, course=course, abstract=abstract, cit_auth=cit_auth,
         results_per_page=results_per_page, page=page
     )
     

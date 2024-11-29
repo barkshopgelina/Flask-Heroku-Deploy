@@ -37,7 +37,8 @@
     <main class="main">
         <div class="heading-container">
             <h1>CapsArc</h1>
-            <p>CapsArc is an online repository featuring an AI-powered IMRAD manuscript generator for capstone projects from Bachelor of Science in Information Technology students at ASU-Kalibo Campus.</p>
+            <p>CapsArc serves as the institutional repository for capstone projects of the 
+               College of Computer Studies at Aklan State University—Kalibo Campus, featuring an IMRaD generator that helps researchers navigate and understand essential aspects of a project.</p>
         </div>
         <div class="search-container">
             <div class="search-box">
@@ -63,7 +64,7 @@
                         </div>
                         <div class="project-info">
                             <h4><a class="project-title" href="/project/{{ project.project_id }}">{{ project.Title }}</a></h4>                
-                            <p class="authors">{{ project.Authors }}, {{ project.Major }} ({{ project.Publication_Year }})</p>
+                            <p class="authors">{{ project.Citation_Authors }}, {{ project.Publication_Year }} - {{ project.course_code }} {{ project.major_code }}</p>
                             <p class="keywords">{{ project.Keywords }}</p>
                             <div class="content-wrapper">
                                 <p class="content">{{ project.Abstract }}</p>

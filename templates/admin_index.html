@@ -72,7 +72,10 @@
                             <a href="{{ url_for('admin_index') }}" class="active custom-color"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('capstone_projects') }}" class="custom-color" ><i class="fa fa-folder fa-fw"></i> Capstone Projects</a>
+                            <a href="{{ url_for('library') }}" class="custom-color" ><i class="fa fa-leanpub fa-fw"></i> Library</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('archive') }}" class="custom-color"><i class="fa fa-archive fa-fw"></i> Archive</a>
                         </li>
                         <li>
                             <a href="{{ url_for('upload_project') }}" class="custom-color"><i class="fa fa-file fa-fw"></i> Upload Project</a>
@@ -95,12 +98,12 @@
                     </div>
                     <!-- /.row -->
                     <div class="row">
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-5">
                             <div class="panel panel-info">
                                 <div class="panel-heading">
                                     <div class="row custom-color">
                                         <div class="col-xs-3">
-                                            <i class="fa fa-file fa-4x"></i>
+                                            <i class="fa fa-leanpub fa-4x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
                                             <div class="huge">{{ count_projects }}</div>
@@ -108,7 +111,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ url_for('capstone_projects') }}">
+                                <a href="{{ url_for('library') }}" class="custom-color">
                                     <div class="panel-footer">
                                         <span class="pull-left">View Details</span>
                                         <span class="pull-right"><i class="fa fa-arrow-circle-right" ></i></span>
@@ -118,7 +121,30 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-5">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <div class="row custom-color">
+                                        <div class="col-xs-3">
+                                            <i class="fa fa-archive fa-4x"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="huge">{{ count_archive_projects }}</div>
+                                            <div>Archive Projects</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="{{ url_for('archive') }}"  class="custom-color">
+                                    <div class="panel-footer">
+                                        <span class="pull-left">View Details</span>
+                                        <span class="pull-right"><i class="fa fa-arrow-circle-right" ></i></span>
+
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-5">
                             <div class="panel panel-info">
                                 <div class="panel-heading">
                                     <div class="row custom-color">
@@ -131,7 +157,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ url_for('active_users') }}">
+                                <a href="{{ url_for('active_users') }}"  class="custom-color">
                                     <div class="panel-footer">
                                         <span class="pull-left">View Details</span>
                                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -141,7 +167,7 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-5">
                             <div class="panel panel-info">
                                 <div class="panel-heading">
                                     <div class="row custom-color">
@@ -154,7 +180,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ url_for('users') }}">
+                                <a href="{{ url_for('users') }}"  class="custom-color">
                                     <div class="panel-footer">
                                         <span class="pull-left">View Details</span>
                                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -170,7 +196,7 @@
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    Top Saved Undergraduate Thesis (Bachelor of Science in Information Technology)
+                                    Top Saved Capstone Projects
                                 </div>
                                 <!-- /.panel-heading -->
                                 <div class="panel-body">
@@ -181,6 +207,7 @@
                                                     <th scope="col">#</th>
                                                     <th scope="col">Title</th>
                                                     <th scope="col">Authors</th>
+                                                    <th scope="col">Course</th>
                                                     <th scope="col">Major</th>
                                                     <th scope="col">Year</th>
                                                     <th scope="col">Actions</th>
@@ -192,12 +219,13 @@
                                                     <td scope="row">{{ loop.index }}</td>
                                                     <td>{{ project.Title }}</td>
                                                     <td>{{ project.Authors }}</td>
-                                                    <td>{{ project.Major }}</td>
+                                                    <td>{{ project.course_code }}</td>
+                                                    <td>{{ project.major_code }}</td>
                                                     <td>{{ project.Publication_Year }}</td>
                                                     <td class="center">
                                                         <a class="btn btn-custom" href="{{ url_for('admin_view_project', project_id=project.project_id) }}"> <i class="fa fa-eye"></i></a>
                                                         <a class="btn btn-info" href="{{ url_for('edit_project', project_id=project.project_id) }}"><i class="fa fa-edit"></i></a>
-                                                        <a class="btn btn-danger"  value="delete" onclick="confirmDelete('{{ project.project_id }}')"><i class="fa fa-trash"></i></a>
+                                                        <a class="btn btn-danger"  value="delete" onclick="confirmDelete('{{ project.project_id }}')"><i class="fa fa-archive"></i></a>
                                                     </td>
                                                 </tr>
                                                 {% endfor %}

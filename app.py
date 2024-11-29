@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect
-from user import index, reset_password_request, home, browse, search, project_details, about, about_us, user_profile, user_library, save_project, delete_project, basename_filter
+from user import index,reset_password_request, home, browse, search, project_details, about, about_us, user_profile, user_library, save_project, delete_project, basename_filter
 from authentication import user_register, admin_register, admin_login, login, logout, logout_admin, change_password, edit_profile
-from admin import admin_index, admin_view_project, reset_password, update_last_active, view_pdf, capstone_projects, active_users, users, upload_project, edit_project, delete_capstone_project, delete_user
+from admin import admin_index, admin_view_project, restore_project_route, reset_password, update_last_active, view_pdf, library, archive, active_users, users, upload_project, edit_project, archive_project, delete_user
 from flask_session import Session
 from flask_cors import CORS
 import uuid
@@ -34,7 +34,7 @@ app.add_url_rule('/profile_actions/edit_profile', endpoint='edit_profile', view_
 app.add_url_rule('/login', endpoint='login', view_func=login, methods=['GET', 'POST'])
 app.add_url_rule('/login/admin', endpoint='admin_login', view_func=admin_login, methods=['GET', 'POST'])
 app.add_url_rule('/logout', endpoint='logout', view_func=logout, methods=['GET','POST'])
-app.add_url_rule('/admin/logout', endpoint='logout_admin')
+app.add_url_rule('/admin/logout', endpoint='logout_admin', view_func=logout_admin, methods=['GET','POST'])
 
 # Routes from user.py
 app.add_url_rule('/capsarc', endpoint='index', view_func=index)
@@ -55,12 +55,14 @@ app.add_url_rule('/delete_project', endpoint='delete_project', view_func=delete_
 app.add_url_rule('/admin_dashboard', endpoint='admin_index', view_func=admin_index, methods=['GET'])
 app.add_url_rule('/admin/view_project/<int:project_id>', endpoint='admin_view_project', view_func=admin_view_project)
 app.add_url_rule('/admin/reset_password/<int:user_id>', endpoint='reset_password', view_func=reset_password, methods=['GET', 'POST'])
-app.add_url_rule('/admin/capstone_projects', endpoint='capstone_projects', view_func=capstone_projects, methods=['GET'])
+app.add_url_rule('/admin/library', endpoint='library', view_func=library, methods=['GET'])
+app.add_url_rule('/admin/archive', endpoint='archive', view_func=archive, methods=['GET'])
 app.add_url_rule('/admin/users', endpoint='users', view_func=users, methods=['GET'])
 app.add_url_rule('/admin/active_users', endpoint='active_users', view_func=active_users, methods=['GET'])
 app.add_url_rule('/admin/upload_project', endpoint='upload_project', view_func=upload_project, methods=['GET', 'POST'])
 app.add_url_rule('/admin/edit_project/<int:project_id>', endpoint='edit_project', view_func=edit_project, methods=['GET', 'POST'])
-app.add_url_rule('/admin/delete_project', endpoint='delete_capstone_project', view_func=delete_capstone_project, methods=['POST'])
+app.add_url_rule('/admin/archive_project', endpoint='archive_project', view_func=archive_project, methods=['POST'])
+app.add_url_rule('/admin/restore_project', endpoint='restore_project_route', view_func=restore_project_route, methods=['POST'])
 app.add_url_rule('/admin/delete_user', endpoint='delete_user', view_func=delete_user, methods=['POST'])
 app.add_url_rule('/view_pdf/<identifier>', endpoint='view_pdf', view_func=view_pdf)
 app.add_url_rule('/update_last_active', endpoint='update_last_active', view_func=update_last_active)

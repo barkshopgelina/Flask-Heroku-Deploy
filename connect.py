@@ -1,4 +1,3 @@
-import mysql.connector
 import os
 from urllib.parse import urlparse
 

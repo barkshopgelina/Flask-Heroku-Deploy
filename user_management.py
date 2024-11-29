@@ -13,7 +13,7 @@ def register_user(first_name=None, last_name=None, course=None, major=None, year
     cursor.execute("""
         SELECT COUNT(*) FROM users 
         WHERE first_name = %s AND last_name = %s
-        AND email = %s AND course = %s AND major = %s  AND username = %s;
+        AND email = %s AND course_ID = %s AND major_ID = %s  AND username = %s;
     """, (first_name, last_name, email, course, major, username))
     user_exists = cursor.fetchone()[0]
 
@@ -35,7 +35,7 @@ def register_user(first_name=None, last_name=None, course=None, major=None, year
     # Insert user data into the database
     try:
         cursor.execute("""
-            INSERT INTO users (first_name, last_name, course, major, year_level, username, password_hash, email)
+            INSERT INTO users (first_name, last_name, course_ID, major_ID, year_level, username, password_hash, email)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (first_name, last_name, course, major, year_level, username, password_hash, email))
         conn.commit()
@@ -145,7 +145,7 @@ def update_user_profile(user_id, first_name, last_name, username, email, course,
     try:
         cursor.execute("""
             UPDATE users
-            SET first_name = %s, last_name = %s, username = %s, email = %s, course = %s, major = %s, year_level = %s, profile_picture_url = %s
+            SET first_name = %s, last_name = %s, username = %s, email = %s, course_ID = %s, major_ID = %s, year_level = %s, profile_picture_url = %s
             WHERE user_id = %s
         """, (first_name, last_name, username, email, course, major, year_level, profile_picture_url, user_id))
         conn.commit()

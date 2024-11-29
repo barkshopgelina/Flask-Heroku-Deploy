@@ -71,8 +71,11 @@
                              <a href="{{ url_for('admin_index') }}" class="custom-color"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                          </li>
                          <li>
-                             <a href="{{ url_for('capstone_projects') }}" class="active custom-color" ><i class="fa fa-folder fa-fw"></i> Capstone Projects</a>
-                         </li>
+                            <a href="{{ url_for('library') }}" class="active custom-color" ><i class="fa fa-leanpub fa-fw"></i> Library</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('archive') }}" class="custom-color"><i class="fa fa-archive fa-fw"></i> Archive</a>
+                        </li>
                          <li>
                              <a href="{{ url_for('upload_project') }}" class="custom-color"><i class="fa fa-file fa-fw"></i> Upload Project</a>
                          </li>
@@ -127,13 +130,23 @@
                                         <input type="text" class="form-control" id="authors" name="authors" value="{{ project.Authors }}" required>
                                     </div>
                                     <div class="form-group">
+                                        <label for="major">Course</label>
+                                        <select class="form-control" id="course" name="course" required>
+                                            <!-- Replace these options with the actual course you want to offer -->
+                                            <option value=1 {% if project.course_ID == 1 %}selected{% endif %}>Bachelor of Science in Information Technology</option>
+                                            <option value=2 {% if project.course_ID == 2 %}selected{% endif %}>Bachelor of Science in Information System</option>
+                                            <option value=3 {% if project.course_ID == 3 %}selected{% endif %}>Bachelor of Science in Entertainment and Multimedia Computing</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
                                         <label for="major">Major</label>
                                         <select class="form-control" id="major" name="major" required>
                                             <!-- Replace these options with the actual majors you want to offer -->
-                                            <option value="SE" {% if project.Major == "SE" %}selected{% endif %}>Software Engineering</option>
-                                            <option value="IST" {% if project.Major == "IST" %}selected{% endif %}>Instructional Systems Technology</option>
-                                            <option value="HN" {% if project.Major == "HN" %}selected{% endif %}>Computer Hardware and Networking Technologies</option>
-                                            <option value="SMBPO" {% if project.Major == "SMBPO" %}selected{% endif %}>Service Management- Business Process Outsourcing</option>
+                                            <option value=1 {% if project.major_ID == 1 %}selected{% endif %}>Software Engineering</option>
+                                            <option value=2 {% if project.major_ID == 2 %}selected{% endif %}>Instructional Systems Technology</option>
+                                            <option value=3 {% if project.major_ID == 3 %}selected{% endif %}>Computer Hardware and Networking Technologies</option>
+                                            <option value=4 {% if project.major_ID == 4 %}selected{% endif %}>Service Management- Business Process Outsourcing</option>
+                                            <option value=5 {% if project.major_ID == 5 %}selected{% endif %}>N/A</option>
                                             <!-- Add more options as needed -->
                                         </select>
                                     </div>
@@ -161,7 +174,7 @@
                                         {% endif %}
                                     </div>
                                     <button type="submit" class="btn btn-custom">Update Project</button>
-                                    <a href="{{ url_for('capstone_projects') }}" class="btn btn-secondary">Cancel</a>
+                                    <a href="{{ url_for('library') }}" class="btn btn-secondary">Cancel</a>
                                 </form>
                                 </div>
                                 </div>

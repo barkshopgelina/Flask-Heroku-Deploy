@@ -766,6 +766,9 @@ table.dataTable thead .sorting:after {
     height:40px;
     margin-right:5px;
 }
+.imrad-content  {
+    text-align:justify ;
+}
 
 @media (max-width:780px)    {
     .custom-search-form {

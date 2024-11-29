@@ -86,8 +86,7 @@
                     </div>
                     <div class="col-lg-10 panel-body">
                         <p><strong>Authors:</strong> {{ project.Authors }}</p>
-                        <p><strong>Course:</strong> {{ project.course_name }}</p>
-                        <p><strong>Major:</strong> {{ project.major_name }}</p>
+                        <p><strong>Major:</strong> {{ project.Major }}</p>
                         <p><strong>Publication Year:</strong> {{ project.Publication_Year }}</p>
                         <h3>Keywords</h3>
                         <p>{{ project.Keywords }}</p>
@@ -131,7 +130,7 @@
                                     <!-- IMRAD Tab -->
                                     <div class="tab-pane fade" id="imrad">
                                         <h4>IMRAD (Introduction, Method, Results and Discussion)</h4>
-                                        <p class="imrad-content">{{ project.generated_imrad | safe }}</p>
+                                        <p>{{ project.generated_imrad | safe }}</p>
                                     </div>
                                 </div>
                             </div>

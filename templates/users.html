@@ -69,14 +69,17 @@
                              <a href="{{ url_for('admin_index') }}" class="custom-color"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
                          </li>
                          <li>
-                             <a href="{{ url_for('capstone_projects') }}" class="custom-color" ><i class="fa fa-folder fa-fw"></i> Capstone Projects</a>
-                         </li>
-                         <li>
-                             <a href="{{ url_for('upload_project') }}" class="custom-color"><i class="fa fa-file fa-fw"></i> Upload Project</a>
-                         </li>
-                         <li>
-                             <a href="{{ url_for('users') }}" class="active custom-color"><i class="fa fa-users fa-fw"></i> Users</a>
-                         </li>
+                            <a href="{{ url_for('library') }}" class="custom-color" ><i class="fa fa-leanpub fa-fw"></i> Library</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('archive') }}" class="custom-color"><i class="fa fa-archive fa-fw"></i> Archive</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('upload_project') }}" class="custom-color"><i class="fa fa-file fa-fw"></i> Upload Project</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('users') }}" class="active custom-color"><i class="fa fa-users fa-fw"></i> Users</a>
+                        </li>
                      </ul>
                  </div>
              </aside>
@@ -107,6 +110,7 @@
                                                     <th scope="row">Firstname</th>
                                                     <th scope="row">Lastname</th>
                                                     <th scope="row">Email</th>
+                                                    <th scope="row">Course</th>
                                                     <th scope="row">Major</th>
                                                     <th scope="row">Year Level</th>
                                                     <th scope="row">Created at</th>
@@ -121,7 +125,8 @@
                                                     <td>{{ users.first_name }}</td>
                                                     <td>{{ users.last_name }}</td>
                                                     <td>{{ users.email }}</td>
-                                                    <td>{{ users.major }}</td>
+                                                    <td>{{ users.course_code }}</td>
+                                                    <td>{{ users.major_code }}</td>
                                                     <td>{{ users.year_level }}</td>
                                                     <td>{{ users.created_at }}</td>
                                                     <td class="center">     

@@ -163,16 +163,19 @@ main {
     font-weight: bolder;
     font-stretch: expanded;
     text-align: left;
-    margin-top: 40px;
-    padding: 20px 40px 10px 10px;
+    margin-top:40px;
+    padding:20px 40px 10px 10px;
 }
 .text-container h3{
     color:whitesmoke;
     width:85%;
     margin:auto;
     font-weight: 500;
-    text-align: left;
+    text-align:justify;
     padding: 5px 10px 7px 10px;
+}
+.text-container ul li{
+    text-align: left;
 }
 .img-container  {
     width:30%;
@@ -349,6 +352,7 @@ ol li{
     width:100%;
     margin:0 auto;
     text-align:justify;
+    font-size: 14px;
 }
 .search-container {
     width: 50%;
@@ -459,18 +463,19 @@ ol li{
     position: relative;
 }
 .project-title {
-    color: #17a2b8;
+    color: #117a8b;
     margin: 0 auto;
 }
 
 .authors, .keywords {
-    margin: 5px;
+    margin:0;
     padding: 0;
     font-size: 14px;
 }
 
 .authors {
-    font-weight: bold;
+    margin-top:0px!important;
+    color: #138496;
 }
 
 .project-info {
@@ -506,7 +511,6 @@ ol li{
 
 .content {
     font-size: 14px;
-    color: #666;
     text-align: justify;
 }
 
@@ -1391,6 +1395,7 @@ footer {
      }
      .text-container h3{
          width: 100% !important;
+         height:60%;
          margin:0 auto;
          padding:0px;
          margin-top:10px;
@@ -1427,6 +1432,9 @@ footer {
     .heading-container   {
         width:100%;
         margin: auto;
+    }
+    .heading-container p    {
+        font-size: 12px;
     }
     .search-container   {
         width:90%;
@@ -1627,6 +1635,9 @@ footer {
      h3 {
         font-size: small;
      }
+     .heading-container p    {
+        font-size: 12px;
+    }
      .text-container h3 {
         width:90%;
      }
@@ -1717,9 +1728,6 @@ footer {
      }
     .text-container {
         height:55vh;
-    }
-    .text-container h3  {
-        width:87%;
     }
 
     .about-container,.project-details-container   {

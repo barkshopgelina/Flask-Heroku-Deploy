@@ -48,9 +48,15 @@
                     </button>
                 </div>
                 <h2>{{ project.Title }}</h2>
-                <p class="project-authors">{{ project.Authors }}, {{ project.Major }} ({{ project.Publication_Year }})</p>
+                <p class="project-authors">{{ project.Authors }}, ({{ project.Publication_Year }})</p>
+                <h4>Course</h4>
+                <p class="project-keywords">{{ project.course_name }}</p>
+                <h4>Major</h4>
+                <p class="project-keywords">{{ project.major_name }}</p>
                 <h4>Keywords</h4>
                 <p class="project-keywords">{{ project.Keywords }}</p>
+                <h4>Citation</h4>
+                <p class="project-keywords">{{ project.Citation_Authors }} ({{ project.Publication_Year }}). <i>{{ project.Citation_Title }}.</i> Aklan State University Kalibo Campus.</p>
                 <h4>Abstract</h4>
                 <p class="project-content">{{ project.Abstract }}</p>
                 <!-- Debugging line: Display the URL being used -->
