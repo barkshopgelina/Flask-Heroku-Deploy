@@ -27,7 +27,7 @@
                 <li><a href="{{ url_for('browse') }}">Browse</a></li>
                 <li><a href="{{ url_for('about') }}">About Us</a></li>
                 <li>
-                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.username }}</a>
+                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.student_ID }}</a>
                     <div class="dropdown-content">
                         <a href="{{ url_for('user_profile') }}">Profile</a>
                         <a href="{{ url_for('user_library') }}">Library</a>
@@ -53,13 +53,10 @@
             </div>
             <div class="profile-info">
                 <h3>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</h3>
-                <p class="username">@{{ session.username }}</p>
+                <p class="username">@{{ session.student_ID }}</p>
                 <hr>
                 <p><strong>Email:</strong> {{ user.email }}</p>
                 <p><strong>Course:</strong> {{ user.course_name }}</p>
-                <p><strong>Major:</strong> {{ user.major_name }}</p>
-                <p><strong>Year Level:</strong> {{ user.year_level }}</p>
-                <p><strong>Joined since:</strong> {{ user.created_at }}</p>
             </div>
             
         </div>

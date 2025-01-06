@@ -10,33 +10,23 @@ import os
 # Register page for users
 def user_register():
     if request.method == 'POST':
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        course = request.form.get('course')
-        major = request.form.get('major')
-        year_level = request.form.get('year_level')
-        username = request.form.get('username')
+        student_ID = request.form.get('student_ID')
         email = request.form.get('email')
         password = request.form.get('password')
 
         # Check for required fields
-        if not username or not email or not password:
+        if not student_ID or not email or not password:
             return render_template('user_register.html', error="All fields are required.")
 
-        # Call register_user function to insert user into database
+        # Validate and register the user
         try:
-            reg_user(first_name, last_name, course, major, year_level, username, password, email)
+            reg_user(student_ID, email, password)
             return redirect(url_for('login'))
         except Exception as e:
             print(f"Error registering user: {e}")
-            error_message = str(e)  # Store the error message for easier checking
-            if "A user with the same details already exists." in error_message:
-                return render_template('user_register.html', error="A user with the same details already exists.")
-            elif "Username already exists." in error_message:
-                return render_template('user_register.html', error="Username already exists. Please choose a different one.")
-            return render_template('user_register.html', error="Registration failed. Please try again.")
+            return render_template('user_register.html', error=str(e))
 
-    # Return a default response for GET requests (rendering the registration form)
+    # Render the registration form for GET requests
     return render_template('user_register.html')
 
 
@@ -64,11 +54,11 @@ def admin_register():
 
 
 
-# Function to get user ID from username
-def get_user_id_from_username(username):
+# Function to get user ID from student_ID
+def get_user_id_from_student_ID(student_ID):
     conn = get_database_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT user_id FROM users WHERE username = %s", (username,))
+    cursor.execute("SELECT user_id FROM users WHERE student_ID = %s", (student_ID,))
     user_id = cursor.fetchone()
     conn.close()
     if user_id:
@@ -89,30 +79,30 @@ def get_admin_id_from_username(username):
 # Login page
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
+        student_ID = request.form.get('student_ID')
         password = request.form.get('password')
 
-        if not username or not password:
+        if not student_ID or not password:
             return render_template('login.html', error="All fields are required.")
 
-        if auth_user(username, password):
+        if auth_user(student_ID, password):
             conn = get_database_connection()
             cursor = conn.cursor()
 
             # Update user status to 'active' in the database
-            cursor.execute("UPDATE users SET status = 'active', last_active = NOW() WHERE username = %s", (username,))
+            cursor.execute("UPDATE users SET status = 'active', last_active = NOW() WHERE student_ID = %s", (student_ID,))
             conn.commit()
 
             cursor.close()
             conn.close()
 
-            user_id = get_user_id_from_username(username)
+            user_id = get_user_id_from_student_ID(student_ID)
             session['user_id'] = user_id
-            session['username'] = username
+            session['student_ID'] = student_ID
             session['logged_in'] = True
             return redirect(url_for('home'))
         else:
-            return render_template('login.html', error="Invalid username or password. Please try again.")
+            return render_template('login.html', error="Invalid student ID or password. Please try again.")
 
     return render_template('login.html')
 
@@ -140,13 +130,13 @@ def admin_login():
 # Logout
 def logout():
      # Clear user status in the database
-    if 'username' in session:
-        username = session['username']
+    if 'student_ID' in session:
+        username = session['student_ID']
 
         conn = get_database_connection()
         cursor = conn.cursor()
 
-        cursor.execute("UPDATE users SET status = NULL WHERE username = %s", (username,))
+        cursor.execute("UPDATE users SET status = NULL WHERE student_ID = %s", (username,))
         conn.commit()
 
         cursor.close()
@@ -154,7 +144,7 @@ def logout():
 
         # Clear session variables
         session.pop('user_id', None)
-        session.pop('username', None)
+        session.pop('student_ID', None)
         session.pop('logged_in', None)
         
     return redirect(url_for('index'))
@@ -190,16 +180,16 @@ def change_password():
         if new_password != confirm_password:
             return render_template('change_password.html', error="New password and confirm password do not match.")
 
-        username = session.get('username')
-        if not username:
+        student_ID = session.get('student_ID')
+        if not student_ID:
             return redirect(url_for('login'))
 
         # Verify current password
-        if not auth_user(username, current_password):
+        if not auth_user(student_ID, current_password):
             return render_template('change_password.html', error="Current password is incorrect.")
 
         # Change password in the database
-        if change_user_password(username, new_password):
+        if change_user_password(student_ID, new_password):
             return render_template('change_password.html', success="Password changed successfully.")
         else:
             return render_template('change_password.html', error="Failed to change password. Please try again.")
@@ -223,14 +213,8 @@ def edit_profile():
     print(f"User ID in edit_profile: {user_id}")  # Debugging line
 
     if request.method == 'POST':
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        username = request.form.get('username')
         email = request.form.get('email')
-        course = request.form.get('course')
-        major = request.form.get('major')
-        year_level = request.form.get('year_level')
-
+        
         # Initialize profile_picture_url
         profile_picture_url = request.form.get('profile_picture_url')
 
@@ -244,7 +228,7 @@ def edit_profile():
                 profile_picture_url = os.path.join('static/images', unique_filename)
 
         # Update user profile
-        success = update_user_profile(user_id, first_name, last_name, username, email, course, major, year_level, profile_picture_url)
+        success = update_user_profile(user_id, email, profile_picture_url)
         if success:
             return redirect(url_for('user_profile'))
         else:

@@ -9,6 +9,7 @@ def get_database_connection():
             host="localhost",
             user="root",
             password="",
+            port="3310",
             database="repository"
         )
         return connection
@@ -40,3 +41,4 @@ def get_database_connection():
     except mysql.connector.Error as err:
         print(f"Error: {err}")
         return None
+

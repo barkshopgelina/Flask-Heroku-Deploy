@@ -735,7 +735,9 @@ table.dataTable thead .sorting:after {
     width: 100%;
     height: 800px; /* Adjust height as needed */
     overflow: hidden;
+    border:1px solid #ccc;
 }
+
 #toolbar {
     margin-top:10px;
     background: rgb(69, 69, 69);
@@ -758,6 +760,7 @@ table.dataTable thead .sorting:after {
     height: 100%;
     border: none;
     transform-origin: top left;
+    
 }
 .btn-secondary  {
     color: #138496!important;
@@ -770,6 +773,114 @@ table.dataTable thead .sorting:after {
     text-align:justify ;
 }
 
+.citation-tab-container {
+    width: 100%;
+    margin:auto;
+    margin-top:10px;
+    background-color: #fff;
+}
+
+
+.citation-tab-container h4 {
+    margin-bottom: 15px;
+    text-align:left;
+}
+
+
+.citation-tab-titles {
+    display: flex;
+    justify-content: left;
+    margin-bottom: 5px;
+    gap: 10px;
+}
+
+.citation-tab-button {
+    padding: 10px 15px;
+    border:none;
+    background-color:transparent;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.citation-tab-button:hover {
+    background-color:#f1f1f1;
+}
+
+.citation-tab-button.active {
+    background-color:transparent;
+    border-bottom: 3px solid #17a2b8;
+    color:#117a8b;
+}
+
+
+
+/* Tab content styling */
+.citation-tab-content {
+    display: none;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    line-height: 1.6;
+    color: #333;
+}
+
+.citation-tab-content.active {
+    display: block;
+}
+
+/* Format-specific content styles */
+.apa-format, .mla-format, .chicago-format {
+    padding: 10px;
+    background-color: #f7f7f7;
+    border-radius: 3px;
+}
+
+.apa-format p, .mla-format p, .chicago-format p {
+    margin: 0;
+    text-align: center;
+}
+
+.copy-button {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+    padding: 5px 10px;
+    background-color: transparent;
+    color: #17a2b8;
+    border: 1px solid #17a2b8;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.div-copy-btn   {
+    text-align: right;
+}
+
+.copy-button:hover {
+    background-color:#17a2b8; 
+    color: #fff; 
+    border-color: #138496;
+}
+
+
+.copy-button:active {
+    transform: scale(0.95);
+}
+
+
+.copy-button.copied {
+    background-color:#17a2b8; 
+    color: #fff; 
+    border-color: #138496;
+}
+
+.add_user   {
+    width: 100%; /* Ensure the container takes the full width */
+    position: relative; /* Creates a positioning context */
+    text-align: left; /* Aligns content to the right */
+    margin-bottom: 20px; /* Adds spacing below the container */
+}
 @media (max-width:780px)    {
     .custom-search-form {
         margin-top:50px;

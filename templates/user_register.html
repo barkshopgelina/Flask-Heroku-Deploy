@@ -17,35 +17,11 @@
         {% if error %}
         <p style="color: red;">{{ error }}</p>
         {% endif %}
-        <input type="text" id="first_name" name="first_name" placeholder="Firstname" required><br>
-        <input type="text" id="last_name" name="last_name" placeholder="Lastname" required><br>
-        <input type="text" id="username" name="username" placeholder="Username" required><br>
+        <input type="number" id="student_ID" name="student_ID" placeholder="Student ID" required><br>
         <input type="email" id="email" name="email" placeholder="Email" required><br>
         <input type="password" id="password" name="password" placeholder="Password"  required><br>
-        <select id="course" name="course" required >
-            <option value="" disabled="" selected="">Course</option>
-            <option value=1>Bachelor of Science in Information Technology</option>
-            <option value=2>Bachelor of Science in Information System</option>
-            <option value=3>Bachelor of Science in Entertainment and Multimedia Computing</option>
-        </select><br>
-        <select id="major" name="major" required>
-            <option value="" disabled="" selected="">Major</option>
-            <option value=1>Software Engineering</option>
-            <option value=2>Instructional Systems Technology</option>
-            <option value=3>Computer Hardware and Networking Technologies</option>
-            <option value=4>Service Management- Business Process Outsourcing</option>
-            <option value=5>N/A</option>
-        </select><br>
-        <select id="year_level" name="year_level" required>
-            <option value="" disabled="" selected="">Year Level</option>
-            <option value="1st Year">1st Year</option>
-            <option value="2nd Year">2nd Year</option>
-            <option value="3rd Year">3rd Year</option>
-            <option value="4th Year">4th Year</option>
-        </select>
         <button type="submit">Sign Up</button>
         <p class="link">Already have an account? <a href="{{ url_for('login') }}">Log In</a></p>
     </form>
-    
 </body>
 </html>

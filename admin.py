@@ -190,13 +190,9 @@ def active_users():
     cursor.execute('''
         SELECT 
             users.*, 
-            course.course_code, 
-            major.major_code
+            course.course_code
         FROM 
             users
-        JOIN 
-            major 
-            ON users.major_ID = major.major_ID
         JOIN 
             course 
             ON users.course_ID = course.course_ID
@@ -221,20 +217,17 @@ def users():
     cursor.execute('''
         SELECT 
             users.*, 
-            course.course_code, 
-            major.major_code
+            course.course_code
         FROM 
             users
-        JOIN 
-            major 
-            ON users.major_ID = major.major_ID
         JOIN 
             course 
             ON users.course_ID = course.course_ID;
     ''')
     users = cursor.fetchall()
-  
+
     return render_template('users.html', users=users)
+
 
 def reset_password(user_id):
     conn = get_database_connection()
@@ -258,7 +251,7 @@ def reset_password(user_id):
         cursor.execute('UPDATE users SET password_hash = %s WHERE user_id = %s', (hashed_password, user_id))
         conn.commit()
 
-        flash('Password reset successfully.', 'info')
+        flash('Password reset successfully.', 'success')
     return render_template('reset_password.html', users=users)
 
 def restore_project_in_db(project_id):
@@ -428,7 +421,7 @@ def extract_text_from_pdf(file):
         return f"Error extracting text: {str(e)}"
 
 def generate_imrad(text):
-    prompt = "Summarize the attached PDF in IMRaD format (Introduction, Method, Results, and Discussion) without using section headers like 'Introduction,' 'Method,' 'Results,' and 'Discussion.' Structure the summary in detailed paragraphs, with each paragraph being long enough to fill at least one full page of a 5-page, short coupon bond. Ensure each paragraph is dense with information, capturing key points and details that are critical to understanding the study's background, research methodology, core findings, and implications or analysis. Include any specific terminology, data, or notable quotes from the original text to ensure that each section is comprehensive and maintains the depth of the original work. Do not limit the generated IMRaD format into 4 paragraphs only."
+    prompt = "Summarize the attached PDF in IMRaD format (Introduction, Method, Results, and Discussion) using section headers like 'Introduction,' 'Method,' 'Results,' and 'Discussion.' Structure the summary in detailed paragraphs, with each paragraph being long enough to fill at least one full page of a 5-page, short coupon bond. Ensure each paragraph is dense with information, capturing key points and details that are critical to understanding the study's background, research methodology, core findings, and implications or analysis. Include any specific terminology, data, or notable quotes from the original text to ensure that each section is comprehensive and maintains the depth of the original work. Do not limit the generated IMRaD format into 4 paragraphs only. Do not add any symbol in the header."
     response = model.generate_content(f"{prompt}: {text}")
     
     return response.text
@@ -474,7 +467,7 @@ def generate_citation_authors(authors):
 def generate_citation_title(title):
     """Generate formatted title for citation using AI."""
     prompt = (
-        f"Format the following title for citation in APA style. Enclose the title in double quotes. the Title of the work should be written in sentence case."
+        f"Format the following title for citation in APA style. The title of the work should be written in sentence case."
         f"Title: {title}"
     )
     response = model.generate_content(prompt)
@@ -640,3 +633,7 @@ def update_project_details(project_details):
     finally:
         cursor.close()
         conn.close()
+
+# add_user.html
+def add_user():
+    return render_template('add_user.html')

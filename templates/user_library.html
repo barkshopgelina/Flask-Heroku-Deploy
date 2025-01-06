@@ -23,7 +23,7 @@
                 <li><a href="{{ url_for('browse') }}">Browse</a></li>
                 <li><a href="{{ url_for('about') }}">About Us</a></li>
                 <li>
-                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.username }}</a>
+                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.student_ID }}</a>
                     <div class="dropdown-content">
                         <a href="{{ url_for('user_profile') }}">Profile</a>
                         <a href="{{ url_for('user_library') }}">Library</a>
@@ -36,36 +36,45 @@
         </nav>
     </header>
     <main class="main">
-        <div class="projects">
+       <div class="projects">
             <div class="savedprojs">
                 <h2>My Library</h2>
             </div>
             <div class="project-list">
-                {% for project in saved_projects %}
-                    <div class="project" id="project_{{ project.lib_id }}">  
-                        <div class="del-btn-container">
-                            <p class="timestamp">{{project.timestamp }}</p>
-                            <button class="delete-btn" onclick="deleteProject('{{ project.lib_id }}')">Delete</button>
-                        </div>
-                        <div class="project-info">
-                            <h4><a class="project-title" href="/project/{{ project.project_id }}">{{ project.Title }}</a></h4>                
-                            <p class="authors">{{ project.Citation_Authors }}, {{ project.Publication_Year }} - {{ project.course_code }} {{ project.major_code }}</p>
-                            <div class="content-wrapper">
-                                <p class="content">{{ project.Abstract }}</p>
+                {% if saved_projects %}
+                    {% for project in saved_projects %}
+                        <div class="project" id="project_{{ project.lib_id }}">
+                            <div class="del-btn-container">
+                                <p class="timestamp">{{ project.timestamp }}</p>
+                                <button class="delete-btn" onclick="deleteProject('{{ project.lib_id }}')">Delete</button>
+
                             </div>
-                            <button class="toggle-content-btn" onclick="toggleContent(this)">Read More</button>
+                            <div class="project-info">
+                                <h4>
+                                    <a class="project-title" href="/project/{{ project.project_id }}">{{ project.Title }}</a>
+                                </h4>
+                                <p class="authors">{{ project.Citation_Authors }}, {{ project.Publication_Year }} - {{ project.course_code }} {{ project.major_code }}</p>
+                                <div class="content-wrapper">
+                                    <p class="content">{{ project.Abstract }}</p>
+                                </div>
+                                <button class="toggle-content-btn" onclick="toggleContent(this)">Read More</button>
+                            </div>
                         </div>
-                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-projects-message">There are no saved projects in your library.</p>
+                {% endif %}
+            </div>
+            <div class="pagination">
+                {% for page_num in range(1, total_pages + 1) %}
+                    <a href="{{ url_for('user_library', results_per_page=results_per_page, page=page_num) }}" class="{% if page_num == current_page %}active{% endif %}">
+                        {{ page_num }}
+                    </a>
                 {% endfor %}
             </div>
         </div>
-        <div class="pagination">
-            {% for page_num in range(1, total_pages + 1) %}
-                <a href="{{ url_for('user_library', results_per_page=results_per_page, page=page_num) }}" class="{% if page_num == current_page %}active{% endif %}">
-                    {{ page_num }}
-                </a>
-            {% endfor %}
-        </div>        
+
+              
     </main>
     <footer>
         <div class="footer-content">
@@ -86,5 +95,28 @@
             <p>&copy; 2024 CapsArc. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        async function deleteProject(entryId) {
+            try {
+                const response = await fetch('/delete_project', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ entry_id: entryId })
+                });
+
+                if (response.status === 204) {
+                    // Project deleted successfully, reload the page
+                    window.location.reload();
+                } else {
+                    console.error("Failed to delete the project.");
+                }
+            } catch (error) {
+                console.error("An error occurred:", error);
+            }
+        }
+
+    </script>
 </body>
 </html>

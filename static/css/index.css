@@ -45,7 +45,7 @@ header .logo {
 header nav {
     display: flex;
     align-items: center;
-    margin-right: 80px; /* Default margin for larger screens */
+    margin-right: 100px; /* Default margin for larger screens */
 }
 
 header nav ul {
@@ -210,7 +210,7 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 .register form {
-    max-width: 400px!important;
+    max-width: 300px!important;
 }
 
 .login h2, .register h2, .change-password {
@@ -219,6 +219,7 @@ main {
 }
 
 .login input[type="text"],
+.login input[type="number"],
 .login input[type="password"] {
     width: calc(100% - 20px);
     background-color:#f5f5f5;
@@ -239,7 +240,7 @@ main {
     font-size: 14px;
 }
 
-.register input[type="text"],.register input[type="email"],
+.register input[type="number"],.register input[type="text"],.register input[type="email"],
 .register input[type="password"], .register select {
     width: calc(100% - 20px);
     background-color:#f5f5f5;
@@ -562,7 +563,7 @@ ol li{
 }
 /* ADVANCED SEARCH FILTERS */
 .advanced-search-container {
-    width:60%;
+    width:70%;
     margin:auto;
     align-items: center;
     display: flex;
@@ -581,12 +582,11 @@ ol li{
     margin:auto;
 
 }
-.advanced-search-container  {
-    width:50%;
-}
 .advanced-search-container form{
     margin:auto;
+    width:100%;
     margin-bottom: 30px;
+   text-align: center;
 }
 
 .advanced-search-container input {
@@ -789,9 +789,120 @@ ol li{
     transition: background-color 0.3s ease-in;
    
 }
+.no-projects-message {
+    text-align: center;
+    font-style: italic;
+    color: #ccc;
+    margin-top: 20px;
+}
+
+
+.citation-tab-container {
+    width: 100%;
+    margin:auto;
+    margin-top:10px;
+    background-color: #fff;
+}
+
+
+.citation-tab-container h4 {
+    margin-bottom: 15px;
+    text-align:left;
+}
+
+
+.citation-tab-titles {
+    display: flex;
+    justify-content: left;
+    margin-bottom: 5px;
+    gap: 10px;
+}
+
+.citation-tab-button {
+    padding: 10px 15px;
+    border:none;
+    background-color:transparent;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.citation-tab-button:hover {
+    background-color:#f1f1f1;
+}
+
+.citation-tab-button.active {
+    background-color:transparent;
+    border-bottom: 3px solid #17a2b8;
+    color:#117a8b;
+}
+
+
+
+/* Tab content styling */
+.citation-tab-content {
+    display: none;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    line-height: 1.6;
+    color: #333;
+}
+
+.citation-tab-content.active {
+    display: block;
+}
+
+/* Format-specific content styles */
+.apa-format, .mla-format, .chicago-format {
+    padding: 10px;
+    background-color: #f7f7f7;
+    border-radius: 3px;
+}
+
+.apa-format p, .mla-format p, .chicago-format p {
+    margin: 0;
+}
+
+.copy-button {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+    padding: 8px 10px;
+    background-color: transparent;
+    color: #17a2b8;
+    border: 1px solid #17a2b8;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.div-copy-btn   {
+    text-align: right;
+}
+
+.copy-button:hover {
+    background-color:#17a2b8; 
+    color: #fff; 
+    border-color: #138496;
+}
+
+
+.copy-button:active {
+    transform: scale(0.95);
+}
+
+
+.copy-button.copied {
+    background-color:#17a2b8; 
+    color: #fff; 
+    border-color: #138496;
+}
+
+
 .tab-container {
     margin-top: 50px;
     width: 100%;
+    border-bottom:1px solid #ccc;
 }
 
 .tab-titles {
@@ -799,44 +910,42 @@ ol li{
     cursor: pointer;
     margin-bottom: 10px;
 }
-
 .tab-button {
-    border:none;
-    border-bottom: 1px solid #ccc;
     background-color: #fff;
-    color: #117a8b;
     padding: 10px;
-    width:50px;
+    width: 50px;
     flex: 1;
     text-align: center;
     outline: none;
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: color 0.3s ease, border-bottom 0.3s ease;
+    border: none;
+    border-bottom: 3px solid transparent;
 }
 
 .tab-button.active {
-    border: 1px solid #ccc;
-    border-radius: 5px 5px 0 0;
-    color:black;
-    border-bottom: none;
+    border-bottom: 3px solid #17a2b8; 
+    color: #17a2b8; 
 }
 
 .tab-button:hover {
-    background-color: #f1f1f1;
-    border-radius: 5px 5px 0 0;
+    background-color:#f1f1f1; 
+}
+.tab-button:hover.active {
+    background-color:transparent; 
 }
 
 .tab-content {
     padding-top: 10px;
-    display:none;
+    display: none;
     text-align: justify;
-
 }
 
 .tab-content.active {
     display: block;
 }
+
 .pdf-container {
     display: flex; 
     flex-direction: column;
@@ -1306,6 +1415,7 @@ footer {
         width: 150px;
         margin-top: -45px;
         margin-right: -10px;
+        
     }
 
     header .menu-toggle {
@@ -1320,6 +1430,8 @@ footer {
         background-color:transparent;
         border-radius:0px;
         box-shadow:none;
+        margin-top:-12px;
+        margin-left:-5px;
     }
     .dropdown-content a, .dropdown-content button:hover {
         background-color:transparent!important;
@@ -1561,11 +1673,11 @@ footer {
         font-size: 12px!important;
      }
     .advanced-search-container select{
-        width: 41% !important;
+        width: 36% !important;
         font-size: 12px!important;
     }
      .title-auth-key {
-        width: 65% !important;
+        width: 70%!important;
     }
     .year{
         width:12%;
@@ -1680,7 +1792,10 @@ footer {
         font-size: 12px;
     }
     .advanced-search-container {
-        width: 80% !important;
+        width: 80%!important;
+     }
+     .advanced-search-container form{
+        width:100%!important;
      }
      .advanced-search-container input   {
         font-size: 12px!important;
@@ -1690,7 +1805,7 @@ footer {
         font-size: 12px!important;
     }
      .title-auth-key {
-        width:60%;
+        width:39%!important;
     }
     .project-heading-container,.savedprojs  {
         width:64%;
@@ -1768,7 +1883,7 @@ footer {
          height:55vh;
      }
      .advanced-search-container {
-        width:63%;
+        width:80%;
      }
      .title-auth-key {
         width:45%;

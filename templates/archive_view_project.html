@@ -51,27 +51,27 @@
          <aside class="sidebar navbar-default" role="navigation">
              <div class="sidebar-nav navbar-collapse">
                  <ul class="nav" id="side-menu">
-                     <li class="sidebar-search">
+                    <li class="sidebar-search">
                         <div class="input-group custom-search-form">
                             <a class="navbar-brand custom-nav-brand custom-color-logo" href="{{ url_for('index') }}"><image src="{{ url_for('static', filename='images/tab_icon.png') }}" class="tab-icon"><i>CapsArc</i></a>
                         </div>
                          <!-- /input-group -->
-                     </li>
-                     <li>
+                    </li>
+                    <li>
                          <a href="{{ url_for('admin_index') }}" class="custom-color"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
-                     </li>
-                     <li>
+                    </li>
+                    <li>
                         <a href="{{ url_for('library') }}" class="custom-color" ><i class="fa fa-leanpub fa-fw"></i> Library</a>
                     </li>
                     <li>
                         <a href="{{ url_for('archive') }}" class="custom-color"><i class="fa fa-archive fa-fw"></i> Archive</a>
                     </li>
-                     <li>
+                    <li>
                          <a href="{{ url_for('upload_project') }}" class="custom-color"><i class="fa fa-file fa-fw"></i> Upload Project</a>
-                     </li>
-                     <li>
-                         <a href="{{ url_for('users') }}" class="custom-color"><i class="fa fa-users fa-fw"></i> Users</a>
-                     </li>
+                    </li>
+                    <li>
+                         <a href="{{ url_for('users') }}" class="custom-color"><i class="fa fa-users fa-fw"></i> Users Management</a>
+                    </li>
                  </ul>
              </div>
          </aside>
@@ -91,7 +91,12 @@
                         <h3>Keywords</h3>
                         <p>{{ project.Keywords }}</p>
                         <h3>Citation</h3>
-                        <p class="project-keywords">{{ project.Citation_Authors }} ({{ project.Publication_Year }}). <i>{{ project.Citation_Title }}.</i> Aklan State University Kalibo Campus.</p>
+                        <h5><b>APA Format</b></h5>
+                        <p class="project-keywords">{{ project.Citation_Authors }} ({{ project.Publication_Year }}). <i>{{ project.Citation_Title }}</i> Unpublished manuscript, Aklan State University Kalibo Campus.</p>
+                        <h5><b>MLA Format</b></h5>
+                        <p class="project-keywords">{{ project.Citation_Authors }}  "{{ project.Citation_Title }}" Unpublished manuscript, Aklan State University Kalibo Campus, {{ project.Publication_Year }}.</p>
+                        <h5><b>Harvard Format</b></h5>
+                        <p class="project-keywords">{{ project.Citation_Authors }}, {{ project.Publication_Year }}. {{ project.Citation_Title }}<i> Unpublished manuscript.</i> Aklan State University Kalibo Campus.</p>
                         <h3>Abstract</h3>
                         <p class="text-justify">{{ project.Abstract }}</p>
                         {% else %}

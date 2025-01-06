@@ -22,7 +22,7 @@
                 <li><a href="{{ url_for('browse') }}">Browse</a></li>
                 <li><a href="{{ url_for('about') }}">About Us</a></li>
                 <li>
-                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.username }}</a>
+                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.student_ID }}</a>
                     <div class="dropdown-content">
                         <a href="{{ url_for('user_profile') }}">Profile</a>
                         <a href="{{ url_for('user_library') }}">Library</a>
@@ -42,47 +42,8 @@
                 <p style="color: red;">{{ error }}</p>
                 {% endif %}
                 <div class="form-group">
-                    <label for="first_name">First Name:</label>
-                    <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
-                </div>
-                <div class="form-group">
-                    <label for="last_name">Last Name:</label>
-                    <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
-                </div>
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" value="{{ user.username }}">
-                </div>
-                <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" id="email" name="email" value="{{ user.email }}">
-                </div>
-                <div class="form-group">
-                    <label for="course">Course:</label>
-                    <select id="course" name="course">
-                        <option value=1 {% if user.course_ID == 1 %}selected{% endif %}>Bachelor of Science in Information Technology</option>
-                        <option value=2 {% if user.course_ID == 2 %}selected{% endif %}>Bachelor of Science in Information System</option>
-                        <option value=3 {% if user.course_ID == 3 %}selected{% endif %}>Bachelor of Science in Entertainment and Multimedia Computing</option>
-                        </select>
-                </div>
-                <div class="form-group">
-                    <label for="major">Major:</label>
-                    <select id="major" name="major">
-                        <option value=1 {% if user.major_ID == 1 %}selected{% endif %}>Software Engineering</option>
-                        <option value=2 {% if user.major_ID == 2 %}selected{% endif %}>Instructional Systems Technology</option>
-                        <option value=3 {% if user.major_ID == 3 %}selected{% endif %}>Computer Hardware and Networking Technologies</option>
-                        <option value=4 {% if user.major_ID == 4 %}selected{% endif %}>Service Management- Business Process Outsourcing</option>
-                        <option value=5 {% if user.major_ID == 5 %}selected{% endif %}>N/A</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="year_level">Year Level:</label>
-                    <select id="year_level" name="year_level">
-                        <option value="1st Year" {% if user.year_level == "1st Year" %}selected{% endif %}>1st Year</option>
-                        <option value="2nd Year" {% if user.year_level == "2nd Year" %}selected{% endif %}>2nd Year</option>
-                        <option value="3rd Year" {% if user.year_level == "3rd Year" %}selected{% endif %}>3rd Year</option>
-                        <option value="4th Year" {% if user.year_level == "4th Year" %}selected{% endif %}>4th Year</option>
-                    </select>
                 </div>
                 <div class="form-group-file-input">
                     <label for="profile_picture" class="file-input-label">Upload Profile Picture:</label>

@@ -1,12 +1,12 @@
 from flask import render_template, request, jsonify, session, redirect, url_for, flash
-from authentication import get_user_id_from_username, get_user_saved_project_ids, change_password
+from authentication import get_user_id_from_student_ID, get_user_saved_project_ids, change_password
 from connect import get_database_connection
 import os
 
 # Function to fetch current user's details including profile picture
 def get_current_user():
-    username = session.get('username')
-    if not username:
+    student_ID = session.get('student_ID')
+    if not student_ID:
         return None
     conn = get_database_connection()
     cursor = conn.cursor(dictionary=True)
@@ -14,17 +14,14 @@ def get_current_user():
         cursor.execute("""
         SELECT 
             u.*, 
-            c.course_name, 
-            m.major_name
+            c.course_name 
         FROM 
             users u
         LEFT JOIN 
             course c ON u.course_ID = c.course_ID
-        LEFT JOIN 
-            major m ON u.major_ID = m.major_ID
         WHERE 
-            u.username = %s
-    """, (username,))
+            u.student_ID = %s
+    """, (student_ID,))
 
         user = cursor.fetchone()
         if user and 'profile_picture_url' in user and user['profile_picture_url']:
@@ -197,8 +194,8 @@ def get_filtered_projects(query=None, year_from=None, year_to=None, course=None,
 
 # Function to save project details to user's library, avoiding duplication
 def save_project_to_library(project_id):
-    if 'username' in session:
-        user_id = get_user_id_from_username(session['username'])
+    if 'student_ID' in session:
+        user_id = get_user_id_from_student_ID(session['student_ID'])
         if user_id:
             conn = get_database_connection()
             cursor = conn.cursor()
@@ -283,8 +280,8 @@ def get_user_projects(user_id, results_per_page=10, page=1):
 
 # Function to delete a saved project from user's library
 def delete_project_from_library(entry_id):
-    if 'username' in session:
-        user_id = get_user_id_from_username(session['username'])
+    if 'student_ID' in session:
+        user_id = get_user_id_from_student_ID(session['student_ID'])
         if user_id:
             conn = get_database_connection()
             cursor = conn.cursor()
@@ -313,8 +310,8 @@ def home():
     projects, total_results = get_projects(year=2024, results_per_page=results_per_page, page=page)
 
     # Determine which projects are saved by the current user
-    if 'username' in session:
-        user_id = get_user_id_from_username(session['username'])
+    if 'student_ID' in session:
+        user_id = get_user_id_from_student_ID(session['student_ID'])
         if user_id:
             saved_project_ids = get_user_saved_project_ids(user_id)
             for project in projects:
@@ -342,7 +339,7 @@ def project_details(identifier):
     if project:
         # Determine if the project is saved by the current user
         if 'username' in session:
-            user_id = get_user_id_from_username(session['username'])
+            user_id = get_user_id_from_student_ID(session['student_ID'])
             if user_id:
                 saved_project_ids = get_user_saved_project_ids(user_id)
                 project['is_saved'] = project['project_id'] in saved_project_ids
@@ -379,8 +376,8 @@ def browse():
     )
     
     # Determine which projects are saved by the current user
-    if 'username' in session:
-        user_id = get_user_id_from_username(session['username'])
+    if 'student_ID' in session:
+        user_id = get_user_id_from_student_ID(session['student_ID'])
         if user_id:
             saved_project_ids = get_user_saved_project_ids(user_id)
             for project in projects:
@@ -406,7 +403,7 @@ def about_us():
     return render_template('about_us.html')
 
 def save_project():
-    if 'username' in session:
+    if 'student_ID' in session:
         project_id = request.json.get('project_id')
         if project_id:
             saved, already_saved = save_project_to_library(project_id)
@@ -418,7 +415,7 @@ def save_project():
 
 # Route to handle deleting a saved project
 def delete_project():
-    if 'username' in session:
+    if 'student_ID' in session:
         entry_id = request.json.get('entry_id')
         if entry_id:
             deleted = delete_project_from_library(entry_id)
@@ -426,12 +423,13 @@ def delete_project():
                 return '', 204
     return '', 400
 
+
 # Example route to display saved searches with pagination
 def user_library():
-    if 'username' not in session:
+    if 'student_ID' not in session:
         return redirect(url_for('login'))
 
-    user_id = get_user_id_from_username(session['username'])
+    user_id = get_user_id_from_student_ID(session['student_ID'])
     if not user_id:
         return redirect(url_for('login'))
 

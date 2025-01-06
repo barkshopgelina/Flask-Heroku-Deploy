@@ -14,7 +14,6 @@
         
     </style>
     
-    
 </head>
 <body oncontextmenu="return false;">
     <header>
@@ -27,7 +26,7 @@
                 <li><a href="{{ url_for('browse') }}">Browse</a></li>
                 <li><a href="{{ url_for('about') }}">About Us</a></li>
                 <li>
-                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.username }}</a>
+                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.student_ID }}</a>
                     <div class="dropdown-content">
                         <a href="{{ url_for('user_profile') }}">Profile</a>
                         <a href="{{ url_for('user_library') }}">Library</a>
@@ -55,8 +54,7 @@
                 <p class="project-keywords">{{ project.major_name }}</p>
                 <h4>Keywords</h4>
                 <p class="project-keywords">{{ project.Keywords }}</p>
-                <h4>Citation</h4>
-                <p class="project-keywords">{{ project.Citation_Authors }} ({{ project.Publication_Year }}). <i>{{ project.Citation_Title }}.</i> Aklan State University Kalibo Campus.</p>
+                
                 <h4>Abstract</h4>
                 <p class="project-content">{{ project.Abstract }}</p>
                 <!-- Debugging line: Display the URL being used -->
@@ -74,12 +72,64 @@
                     </div>
                 
                     <div id="imrad" class="tab-content">
-                        <h4>IMRAD (Introduction, Method, Results and Discussion)</h4>
                         <div class="imrad-output" id="imrad-output">
                             <p>{{ project.generated_imrad | safe }}</p>
                         </div>
                     </div>                                               
                 </div>
+
+                
+                <div class="citation-tab-container">
+                    <h4>Citation</h4>
+                    <div class="citation-tab-titles">
+                        <button class="citation-tab-button active" onclick="openCitationTab('apa')">APA</button>
+                        <button class="citation-tab-button" onclick="openCitationTab('mla')">MLA</button>
+                        <button class="citation-tab-button" onclick="openCitationTab('chicago')">Chicago</button>
+                    </div>
+
+                    <div id="citation-apa" class="citation-tab-content active">
+                        <div class="apa-format">
+                            <p id="apa-citation">
+                                {{ project.Citation_Authors }} ({{ project.Publication_Year }}). 
+                                <i>{{ project.Citation_Title }}</i>. 
+                                Unpublished manuscript, Aklan State University Kalibo Campus.
+                            </p>
+                            <div class="div-copy-btn">
+                                <button class="copy-button" onclick="copyCitation('apa-citation')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="citation-mla" class="citation-tab-content">
+                        <div class="mla-format">
+                            <p id="mla-citation">
+                                {{ project.Citation_Authors }}. 
+                                "{{ project.Citation_Title }}." 
+                                Unpublished manuscript, Aklan State University Kalibo Campus, {{ project.Publication_Year }}.
+                            </p>
+                            <div class="div-copy-btn">
+                                <button class="copy-button" onclick="copyCitation('mla-citation')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="citation-chicago" class="citation-tab-content">
+                        <div class="chicago-format">
+                            <p id="chicago-citation">
+                                {{ project.Citation_Authors }}. 
+                                {{ project.Publication_Year }}. 
+                                <i>{{ project.Citation_Title }}</i>. 
+                                Unpublished manuscript, Aklan State University Kalibo Campus.
+                            </p>
+                            <div class="div-copy-btn">
+                                <button class="copy-button" onclick="copyCitation('chicago-citation')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                
             </div>
         </div>
     </main>
@@ -157,17 +207,30 @@
                 console.error('Error rendering page:', error);
             });
         }
-
-        // Function to open a specific tab
+    // Function to open a specific tab
     function openTab(tabName) {
-        // Hide all tab content
+        // Hide all tab contents
         const tabs = document.querySelectorAll('.tab-content');
         tabs.forEach(tab => {
-            tab.style.display = 'none';
+            tab.style.display = 'none'; // Hide all tabs
+            tab.classList.remove('active'); // Remove active class from content
         });
 
-        // Show the selected tab
-        document.getElementById(tabName).style.display = 'block';
+        // Show the selected tab content
+        const selectedTab = document.getElementById(tabName);
+        selectedTab.style.display = 'block';
+        selectedTab.classList.add('active'); // Add active class to selected tab content
+
+        // Update active class on tab buttons
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(button => button.classList.remove('active')); // Remove active from all buttons
+
+        // Find and activate the clicked button
+        const clickedButton = document.querySelector(`[onclick="openTab('${tabName}'); fadeInImrad();"]`) || 
+                            document.querySelector(`[onclick="openTab('${tabName}')"]`);
+        if (clickedButton) {
+            clickedButton.classList.add('active');
+        }
     }
 
     // Delay function for IMRAD with fade-in effect
@@ -184,8 +247,44 @@
     // Optional: Add an event listener to initially hide the output
     document.addEventListener("DOMContentLoaded", function() {
         const imradOutput = document.getElementById("imrad-output");
-        imradOutput.style.opacity = "0"; // Initially hidden
+        if (imradOutput) {
+            imradOutput.style.opacity = "0"; // Initially hidden
+        }
     });
+
+    // Function to handle tab switching
+    function openCitationTab(tabId) {
+        const tabContainer = document.querySelector('.citation-tab-container');
+        const tabContents = tabContainer.querySelectorAll('.citation-tab-content');
+        const tabButtons = tabContainer.querySelectorAll('.citation-tab-button');
+
+        tabContents.forEach(content => content.classList.remove('active'));
+        tabButtons.forEach(button => button.classList.remove('active'));
+
+        document.getElementById(`citation-${tabId}`).classList.add('active');
+        tabContainer.querySelector(`.citation-tab-button[onclick="openCitationTab('${tabId}')"]`).classList.add('active');
+    }
+
+    function copyCitation(citationId) {
+    const citationText = document.getElementById(citationId).innerText;
+    const copyButton = document.querySelector(`#${citationId} + .div-copy-btn .copy-button`);
+
+    // Copy the text to the clipboard
+    navigator.clipboard.writeText(citationText).then(() => {
+        // Add the "copied" class and change text
+        copyButton.classList.add('copied');
+        copyButton.innerText = 'Copied';
+
+        // Reset the button after 2 seconds
+        setTimeout(() => {
+            copyButton.classList.remove('copied');
+            copyButton.innerText = 'Copy';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy citation:', err);
+    });
+}
+
 
 
 

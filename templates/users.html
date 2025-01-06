@@ -78,7 +78,7 @@
                             <a href="{{ url_for('upload_project') }}" class="custom-color"><i class="fa fa-file fa-fw"></i> Upload Project</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('users') }}" class="active custom-color"><i class="fa fa-users fa-fw"></i> Users</a>
+                            <a href="{{ url_for('users') }}" class="active custom-color"><i class="fa fa-users fa-fw"></i> Users Management</a>
                         </li>
                      </ul>
                  </div>
@@ -102,17 +102,19 @@
                                 <!-- /.panel-heading -->
                                 <div class="panel-body">
                                     <div class="table-responsive">
-                                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                        <div class="add_user"> 
+                                            <a class="btn btn-custom" href="{{ url_for('add_user')}}">Create New User</a>
+                                        </div>                                        
+                                        
+                                        <table class="table table-striped table-bordered table-hover mt-5" id="dataTables-example">
                                             <thead>
                                                 <tr>
                                                     <th scope="row">#</th>
-                                                    <th scope="row">Username</th>
+                                                    <th scope="row">Student ID</th>
                                                     <th scope="row">Firstname</th>
                                                     <th scope="row">Lastname</th>
                                                     <th scope="row">Email</th>
                                                     <th scope="row">Course</th>
-                                                    <th scope="row">Major</th>
-                                                    <th scope="row">Year Level</th>
                                                     <th scope="row">Created at</th>
                                                     <th scope="row">Actions</th>
                                                 </tr>
@@ -121,13 +123,11 @@
                                                 {% for users in users %}
                                                 <tr class="odd gradeX">
                                                     <td scope="row">{{ loop.index }}</td>
-                                                    <td>{{ users.username }}</td>
+                                                    <td>{{ users.student_ID }}</td>
                                                     <td>{{ users.first_name }}</td>
                                                     <td>{{ users.last_name }}</td>
                                                     <td>{{ users.email }}</td>
                                                     <td>{{ users.course_code }}</td>
-                                                    <td>{{ users.major_code }}</td>
-                                                    <td>{{ users.year_level }}</td>
                                                     <td>{{ users.created_at }}</td>
                                                     <td class="center">     
                                                         <a class="btn btn-custom" href="{{ url_for('reset_password', user_id=users['user_id']) }}"><i class="fa fa-lock"></i></a>

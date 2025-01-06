@@ -24,7 +24,7 @@
                 <li><a href="{{ url_for('browse') }}" class="active-page">Browse</a></li>
                 <li><a href="{{ url_for('about') }}">About Us</a></li>
                 <li>
-                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.username }}</a>
+                    <a href="#" id="profile-toggle"><img src="{{ url_for('static', filename='images/user_icon.png') }}" class="user_icon-img"  alt="user_icon"> {{ session.student_ID}}</a>
                     <div class="dropdown-content">
                         <a href="{{ url_for('user_profile') }}">Profile</a>
                         <a href="{{ url_for('user_library') }}">Library</a>
@@ -42,11 +42,11 @@
                 <h4>Advanced Search</h4>
             </div>
             <form action="{{ url_for('browse') }}" method="get">
-                <input type="text" name="query" placeholder="Title, Authors, Keywords" class="title-auth-key">
-                <input type="number" class="year" name="Publication_Year_From" placeholder="Year"> -
-                <input type="number" class="year" name="Publication_Year_To" placeholder="Year">
+                <input type="text" name="query" placeholder="Search projects..." class="title-auth-key">
+                from <input type="number" class="year" name="Publication_Year_From" placeholder="year"> to 
+                <input type="number" class="year" name="Publication_Year_To" placeholder="year">
                 <select name="course_ID" id="course_ID">
-                    <option value="" disabled="" selected="">-Course-</option>
+                    <option value="" disabled="" selected="">-course-</option>
                     <option value=1>BSINFOTECH</option>
                     <option value=2>BSIS</option>
                     <option value=3>BSEMC</option>
@@ -60,38 +60,43 @@
                     <h2>Capstone Projects</h2>
                 </div>
                 <div class="result_per_page_form">
-                <form>  
-                    <label for="result_per_page">View: </label>
-                    <select name="results_per_page" id="results_per_page" class="results_per_page">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                    </select>
-                </form>
+                    <form>
+                        <label for="result_per_page">View: </label>
+                        <select name="results_per_page" id="results_per_page" class="results_per_page">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </form>
                 </div>
             </div>
-            
+        
             <div class="project-list">
-                {% for project in projects %}
-                    <div class="project">
-                        <div class="btn-container">
-                            <button id="save-btn-{{ project.project_id }}" class="save-btn {% if project.is_saved %}green{% else %}blue{% endif %}" onclick="saveProject('{{ project.project_id }}')">
-                                {% if project.is_saved %}Saved{% else %}Save{% endif %}
-                            </button>
-                        </div>
-                        <div class="project-info">
-                            <h4><a class="project-title" href="/project/{{ project.project_id }}">{{ project.Title }}</a></h4>                
-                            <p class="authors">{{ project.Citation_Authors }}, {{ project.Publication_Year }} - {{ project.course_code }} {{ project.major_code }}</p>
-                            <p class="keywords">{{ project.Keywords }}</p>
-                            <div class="content-wrapper">
-                                <p class="content">{{ project.Abstract }}</p>
+                {% if projects|length == 0 %}
+                    <p class="no-projects-message">No projects found</p>
+                {% else %}
+                    {% for project in projects %}
+                        <div class="project">
+                            <div class="btn-container">
+                                <button id="save-btn-{{ project.project_id }}" class="save-btn {% if project.is_saved %}green{% else %}blue{% endif %}" onclick="saveProject('{{ project.project_id }}')">
+                                    {% if project.is_saved %}Saved{% else %}Save{% endif %}
+                                </button>
                             </div>
-                            <button class="toggle-content-btn" onclick="toggleContent(this)">Read More</button>
+                            <div class="project-info">
+                                <h4><a class="project-title" href="/project/{{ project.project_id }}">{{ project.Title }}</a></h4>                
+                                <p class="authors">{{ project.Citation_Authors }}, {{ project.Publication_Year }} - {{ project.course_code }} {{ project.major_code }}</p>
+                                <p class="keywords">{{ project.Keywords }}</p>
+                                <div class="content-wrapper">
+                                    <p class="content">{{ project.Abstract }}</p>
+                                </div>
+                                <button class="toggle-content-btn" onclick="toggleContent(this)">Read More</button>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% endif %}
             </div>
-        </div>        
+        </div>
+        
         <div class="pagination">
             {% for page_num in range(1, total_pages + 1) %}
                 <a href="{{ url_for('browse', Title=request.args.get('Title'), Authors=request.args.get('Authors'), Publication_Year_From=request.args.get('Publication_Year_From'), Publication_Year_To=request.args.get('Publication_Year_To'), Major=request.args.get('Major'), Keywords=request.args.get('Keywords'), Content=request.args.get('Content'), results_per_page=results_per_page, page=page_num) }}" class="{% if page_num == current_page %}active{% endif %}">
@@ -99,6 +104,8 @@
                 </a>
             {% endfor %}
         </div>
+        
+        
     </main>
     <footer>
         <div class="footer-content">
